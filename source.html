@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>IP-API.com - Free Geolocation API</title>
+		<meta name="description" content="Free Geolocation API">
+		<meta name="keywords" content="ip api geo location geoip geolocation my ip address city state region rdns reversedns dns">
+		<meta name="viewport" content="width=830,initial-scale=1,minimum-scale=0,user-scalable=yes">
+		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+		<style>
+				html {
+					overflow-y: scroll;
+				}
+
+				body {
+					width: 810px;
+					margin: 20px auto 10px;
+					padding: 0 10px;
+					font: 13px/1.231 sans-serif;
+					background: #EEE;
+					color: #444;
+					line-height: 1.4em;
+					font-size: 1em;
+				}
+
+				h2 {
+					border-bottom: 1px solid #ccc;
+					font-size: 1.2em;
+					font-weight: 700;
+					margin: 7px 0 15px;
+				}
+
+				h3 {
+					margin: 16px 0 10px 0;
+				}
+
+				div#contentDiv {
+					background: #FFF;
+					border: 1px solid #ccc;
+					-moz-border-radius: 0 0 8px 8px;
+					border-radius: 0 0 8px 8px;
+					width: 730px;
+					border-width: 1px;
+					padding: 8px 40px;
+				}
+
+				.b {
+					font-weight: 700;
+				}
+
+				.headerClass {
+					height: 59px;
+					width: 712px;
+					background-color: #828282;
+					-moz-border-radius: 8px 8px 0 0;
+					border-radius: 8px 8px 0 0;
+					text-align: center;
+					position: relative;
+					padding: 0 50px;
+				}
+
+				.headerClass h1 {
+					color: #f2f2f2;
+					font-size: 1.5em;
+					line-height: 1.1em;
+					margin-top: 1px;
+					padding: 4px;
+				}
+
+				.headerClass h1 a {
+					color: #EEE;
+					outline: 0;
+					text-decoration: none;
+				}
+
+				.headerClass h1 a:hover {
+					color: #e6e6e6;
+				}
+
+				.footerClass {
+					color: #999;
+					padding-top: 9px;
+					font-size: .8em;
+					text-align: center;
+					width: 800px;
+					margin-left: auto;
+					margin-right: auto;
+				}
+
+				.footerClass a {
+					cursor: pointer;
+				}
+
+				a {
+					color: #797979;
+					outline: 0;
+					text-decoration: none;
+				}
+
+				a:hover {
+					text-decoration: underline;
+				}
+
+				td,th {
+					vertical-align: middle;
+					line-height: 23px;
+				}
+
+				th {
+					text-align: right;
+					font-weight: 400;
+					color: #777;
+					white-space: nowrap;
+					width: 135px;
+				}
+
+				td {
+					padding: 0 2px 0 5px;
+					font-weight: 700;
+					font-size: 16px;
+					color: #737373;
+				}
+
+				#submitText {
+					width: 205px;
+					top: -2px;
+					height: 27px;
+					font-size: 14px;
+					font-weight: 700;
+					margin-left: 17px;
+				}
+
+				#resultDiv {
+					background-repeat: no-repeat;
+					background-position: right top;
+					width: 730px;
+				}
+
+				#resultDiv span {
+					background: #fff;
+					background: rgba(255,255,255,.7);
+				}
+
+				#geoDiv {
+					margin-top: 7px;
+					font-weight: 700;
+				}
+
+				input:hover {
+					-moz-box-shadow: 0 0 3px #999;
+					-webkit-box-shadow: 0 0 3px #999;
+					box-shadow: 0 0 3px #999;
+					border-color: #7d7d7d;
+					background-color: #f5f5f5;
+				}
+
+				input {
+					-webkit-border-radius: 4px;
+					-moz-border-radius: 4px;
+					border-radius: 4px;
+					-moz-background-clip: padding;
+					-webkit-background-clip: padding-box;
+					border: 1px solid #aaa;
+					white-space: nowrap;
+					position: relative;
+					color: #444;
+					text-decoration: none;
+					font-size: 12px;
+					margin-left: 8px;
+					width: 98%;
+					height: 23px;
+					line-height: 23px;
+					padding-left: 5px;
+					-webkit-transition: background-color .5s;
+					-moz-transition: background-color .5s;
+					-o-transition: background-color .5s;
+					transition: background-color .5s;
+					vertical-align: bottom;
+					background: padding-box #fff;
+				}
+
+				input::-moz-focus-inner {
+					border: 0;
+					padding: 0;
+				}
+
+				fieldset {
+					margin: 0 2px 15px 2px;
+					padding: 2px 8px 8px;
+					-webkit-border-radius: 4px;
+					-moz-border-radius: 4px;
+					border-radius: 4px;
+					-moz-background-clip: padding;
+					-webkit-background-clip: padding-box;
+					border: 1px solid #aaa;
+					background: #fbfbfb;
+				}
+
+				fieldset div {
+					height: 29px;
+					position: relative;
+					width: 478px;
+					display: inline-block;
+				}
+
+				legend label {
+					font-size: 16px;
+					line-height: normal;
+					border: 0 none;
+					padding: 0;
+				}
+		</style>
+	</head>
+	<body>
+		<div class="headerClass">
+			<h1>
+				<a href="#">IP-API.com<br><span id="headerText"></span></a>
+			</h1>
+		</div>
+		<div id="contentDiv">
+			<form onsubmit="return query(document.forms[0].ip.value),false">
+				<fieldset>
+					<legend>
+						<label for="ip" id="queryLabel"></label>
+					</legend>
+					<div>
+						<input id="ip" type="text" autofocus spellcheck="false">
+					</div><input type="submit" id="submitText">
+				</fieldset>
+			</form>
+			<h2 id="resultText">JavaScript is required.</h2>
+			<div id="resultDiv">
+				<table>
+					<tbody id="resultTbody"></tbody>
+				</table>
+			</div>
+			<div id="geoDiv"></div>
+			<h3>
+				<a href="/docs/" id="docsDiv"></a>
+			</h3>
+		</div>
+		<div class="footerClass">
+				<div id="translationsDiv"></div>
+				&copy; 2015 IP-API.com |
+				<a href="/docs/">api</a> |
+				<a onclick="contact()">contact</a> |
+				<a href="https://addons.opera.com/en/extensions/details/ip-to-geolocation/">opera</a> /
+				<a href="https://chrome.google.com/webstore/detail/ip-to-geolocation/loodiohabdlajgabpclpddgnfdbcmdba">chrome</a> /
+				<a href="https://addons.mozilla.org/en-US/firefox/addon/ip-to-geolocation/">firefox</a>
+				extension
+		</div>
+		<script>
+			function contact() {
+				 prompt('', unescape(('636f6e746163744069702d6170692e636f6d').replace(/(..)/g, '%$1')));
+				 return false
+			}
+
+			function ajax(url, callback, setLang) {
+				url = protocol + "//" + url;
+				this.getRequest = function() {
+					return window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : window.XMLHttpRequest ? new XMLHttpRequest : false
+				}
+
+				var req = getRequest();
+
+				req.onreadystatechange = function () {
+					if (req.readyState == 4) {
+						callback(jsonParse(req.responseText));
+					}
+				}
+				req.open("GET", url, true);
+				if(setLang) {
+					req.setRequestHeader("Accept-Language", "force;" + currentLanguage)
+				}
+				req.send();
+			}
+
+			function jsonParse(raw) {
+				try {
+					return JSON.parse(raw)
+				} catch (e) {
+					return false
+				}
+			}
+
+			function byId(element) {
+				return document.getElementById(element)
+			}
+
+			function newElement(tag) {
+				return document.createElement(tag);
+			}
+
+			function updateElement(element, html) {
+				try {
+					byId(element).innerHTML = html
+				} catch (i) {
+					if (element == 'resultTbody') {
+						ie8_fix(byId(element), html);
+					}
+				}
+			}
+
+			function updateTable(name, value, id) {
+				var table = byId("resultTbody");
+				if (table) {
+					if(id && byId(id)) {
+						return updateElement(id, value);
+					}
+					var tr = newElement("tr"),
+						th = newElement("th"),
+						td = newElement("td"),
+						span = newElement("span");
+					if(id) {
+						span.id = id;
+					}
+					th.appendChild(document.createTextNode(name + ":"));
+					span.innerHTML = value;
+					td.appendChild(span);
+					tr.appendChild(th);
+					tr.appendChild(td);
+					table.appendChild(tr);
+				}
+			}
+
+			function makeClickable(ip) {
+				return "<a href='#" + ip + "'>" + ip + "</a>"
+			}
+
+			function ie8_fix(element, html) {
+				var i = ie8_fix_div;
+				i.innerHTML = "<table><tbody id='resultTbody'><th>" + html + "</th></tbody></table>", element.parentNode.replaceChild(i.firstChild.firstChild, element)
+			}
+
+			function nullFunction() {
+			}
+
+
+			function setMap(lat, lon, zoom) {
+				byId("resultDiv").style.backgroundImage = "url('" + protocol + "//maps.googleapis.com/maps/api/staticmap?center=" + lat + "," + lon + "&zoom=" + zoom + "&size=320x349&sensor=false&language=" + currentLanguage + "')"
+			}
+
+			function unSetMap() {
+				byId("resultDiv").style.backgroundImage = "";
+				MapOpacity(1)
+			}
+
+			function MapOpacity(e) {
+				byId("resultDiv").style.opacity = e
+			}
+
+			function get_internal() {
+				var duplicates = {},
+					e = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection,
+					g = {
+						optional: [{
+							RtpDataChannels: true
+						}]
+					},
+					servers = undefined;
+				if(window.webkitRTCPeerConnection) {
+					 servers = {iceServers: [{urls: "stun:stun.services.mozilla.com"}]};
+				}
+				try {
+					var b = new e(servers, g)
+				} catch (h) { // old chrome
+					b = new e({
+						iceServers: []
+					})
+				}
+				b.onicecandidate = function(c) {
+					if (c.candidate) {
+						var c = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(c.candidate.candidate)[1],
+							b = makeClickable(c),
+							ip = c.split(".");
+						if(duplicates[b] === undefined) {
+							duplicates[b] = true;
+							if ((ip[0] == 10) || (ip[0] == 172 && (ip[1] >= 16 && ip[1] <= 31)) || (ip[0] == 192 && ip[1] == 168) || (ip[0] == 0) || (ip[0] == 127) || (ip[0] == 100 && (ip[1] >= 64 && ip[1] <= 127)) || (ip[0] == 169 && ip[1] == 254) || (ip[0] == 192 && ip[1] == 0 && ip[2] == 2) || (ip[0] >= 224 && ip[0] <= 255) || (ip[0] == 198 && (ip[1] == 18 || ip[1] == 19))) {
+								updateTable(l[25], Object.keys(duplicates).join(", "), "in")
+							} else if (myIp != c) {
+								updateTable(l[6], makeClickable(myIp) + ", " + b, "qr");
+							}
+						}
+					}
+				};
+				try {
+					b.createDataChannel("")
+				} catch (k) {}
+
+				b.createOffer(function(c) {
+					b.setLocalDescription(c, nullFunction, nullFunction)
+				}, nullFunction)
+			};
+
+			function get_dns() {
+				for (var random = ""; 32 > random.length; random += Math.random().toString(36).substr(2)) {}
+				ajax(random.substr(0, 32) + ".edns." + l[27] + "/json/", function(data) {
+					if (data.dns) {
+						updateTable(l[20], makeClickable(data.dns.ip) + " (" + data.dns.geo + ")");
+					}
+					if (data.edns) {
+						updateTable(l[21], makeClickable(data.edns.ip) + " (" + data.edns.geo + ")");
+					}
+				}, 1);
+			}
+
+			function delayed_dns_internal() { // firefox tends to hang on webrtc, so we just wait 15ms for screen to draw
+				setTimeout(function() {
+					get_dns();
+					get_internal();
+				}, 15)
+			}
+
+			function getBrowserGeo() {
+				currentQuery = location.hash = "";
+				MapOpacity(.6);
+				updateElement("resultText", l[23]);
+				if (navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function(geo) {
+					if (geo.coords.latitude && geo.coords.longitude) {
+						ajax("query.yahooapis.com/v1/public/yql?q=select%20*%20from%20geo.placefinder%20where%20text=%22" + geo.coords.latitude.toFixed(5) + "," + geo.coords.longitude.toFixed(5) + "%22%20and%20gflags=%22R%22%20and%20lang=%22" + currentLanguage + "%22%20limit%201&format=json", function(yqlResponse) {
+							if (yqlResponse.query) {
+								yqlResponse = yqlResponse.query.results.Result;
+								ajax(l[27] + "/json/", function(response) {
+									unSetMap();
+									updateElement("resultText", l[0]);
+									if (response.status == "success") {
+										document.forms[0].ip.value = myIp = response.query;
+										updateElement("resultTbody", "");
+										zoom = yqlResponse.house != null || yqlResponse.street != null || yqlResponse.neighborhood != null ? 15 : "" != yqlResponse.zip ? 13 : "" != yqlResponse.city ? 12 : 6;
+										setMap(yqlResponse.latitude, yqlResponse.longitude, zoom);
+										updateTable(l[6], makeClickable(response.query));
+										updateTable(l[7], yqlResponse.country);
+										updateTable(l[8], yqlResponse.countrycode);
+										yqlResponse.state != null ? updateTable(l[9], yqlResponse.state) : updateTable(l[9], yqlResponse.county);
+										yqlResponse.statecode != null ? updateTable(l[10], yqlResponse.statecode) : updateTable(l[10], yqlResponse.countycode);
+										updateTable(l[11], yqlResponse.city);
+										updateTable(l[12], (yqlResponse.house == null ? "" : yqlResponse.house + " ") + (yqlResponse.street == null ? "" : yqlResponse.street + " ") + (yqlResponse.neighborhood == null ? "" : yqlResponse.neighborhood));
+										updateTable(l[13], yqlResponse.postal);
+										updateTable(l[14], yqlResponse.latitude);
+										updateTable(l[15], yqlResponse.longitude);
+										updateTable(l[16], response.timezone);
+										updateTable(l[17], response.isp);
+										updateTable(l[18], response.org);
+										updateTable(l[19], response.as);
+										delayed_dns_internal();
+									} else {
+										updateElement("resultTbody", l[1] + response.query + " (" + response.message + ")");
+									}
+								}, 1);
+							} else {
+								unSetMap();
+								updateElement("resultTbody", l[1] + response.coords.latitude.toFixed(5) + "," + response.coords.longitude.toFixed(5));
+								updateElement("resultText", l[22]);
+							}
+						})
+					} else {
+						updateElement("resultTbody", l[2]);
+					}
+				}, function(error) {
+					unSetMap();
+					updateElement("resultText", l[0]);
+					switch (error.code) {
+						case error.TIMEOUT:
+							updateElement("resultTbody", l[3]);
+							break;
+						case error.POSITION_UNAVAILABLE:
+							updateElement("resultTbody", l[2]);
+							break;
+						default:
+						case error.UNKNOWN_ERROR:
+							updateElement("resultTbody", l[4])
+					}
+				});
+				} else {
+					updateElement("resultTbody", l[5]);
+				}
+				return false
+			}
+
+			function query(query) {
+				if (typeof query == "undefined") {
+					query = location.hash.substring(1);
+				}
+				MapOpacity(.6);
+				currentQuery = location.hash = document.forms[0].ip.value = query;
+				updateElement("resultText", l[23]);
+				ajax(l[27] + "/json/" + query, function(response) {
+					unSetMap();
+					updateElement("geoDiv", "");
+					updateElement("resultTbody", "");
+					if (response.status == "success") { 
+						zoom = response.zip != "" ? 13 : response.city != "" ? 12 : 6;
+						setMap(response.lat, response.lon, zoom);
+						updateTable(l[6], makeClickable(response.query), "qr");
+						updateTable(l[7], response.country);
+						updateTable(l[8], response.countryCode);
+						updateTable(l[9], response.regionName);
+						updateTable(l[10], response.region);
+						updateTable(l[11], response.city);
+						updateTable(l[13], response.zip);
+						updateTable(l[14], response.lat);
+						updateTable(l[15], response.lon);
+						updateTable(l[16], response.timezone);
+						updateTable(l[17], response.isp);
+						updateTable(l[18], response.org);
+						updateTable(l[19], response.as);
+						if (query == "") { 
+							document.forms[0].ip.value = myIp = response.query;
+							if (navigator.geolocation) {
+								updateElement("geoDiv", "<a href='#' onclick='getBrowserGeo()'>" + l[26] + "</a>");
+							}
+							updateElement("resultText", l[24]);
+							delayed_dns_internal();
+						} else {
+							updateElement("resultText", l[22]);
+						}
+					} else {
+						 updateElement("resultTbody", l[1] + response.query + " (" + response.message + ")");
+						 updateElement("resultText", l[22]);
+					}
+				}, 1)
+			}
+
+			function setLanguage(language) {
+				window.localStorage.l = language
+			}
+
+			function getLanguage() {
+				return window.localStorage.l || defaultLanguage
+			}
+
+			function init(language) {
+				if (language) {
+					setLanguage(language);
+				} else {
+					language = getLanguage();
+				}
+				if (!(language in translations)) {
+					language = defaultLanguage; 
+					setLanguage(defaultLanguage);
+				}
+				currentLanguage = language.substr(0, 2) == "es" ? "es" : language; // es-ES and es-AR 
+				l = translations[language].split(";");
+				footerLanguages = "";
+				for (var lng in translations) {
+					footerLanguages += '<a class="' + (lng == language ? 'b' : '" onclick="init(\'' + lng + '\')') + '">' + translations[lng].split(";")[33] + '</a> - ';
+				}
+				updateElement("translationsDiv", footerLanguages.substr(0, footerLanguages.length - 3));
+				document.title = l[28];
+				updateElement("queryLabel", l[29]);
+				updateElement("headerText", l[30]);
+				updateElement("docsDiv", l[31]);
+				byId("submitText").value = l[32];
+				query();
+			}
+
+			var translations = {
+					"en":		"Your current Browser Geolocation;Unable to retrieve geolocation information for ;Your Geolocation is currently unavailable;Timeout while getting Geolocation;Unknown error;Your browser doesn't support Geolocation;IP;Country;Country code;Region;Region code;City;Address;Zip Code;Latitude;Longitude;Timezone;ISP;Organization;AS number/name;DNS server;edns-client-subnet;Query result;Loading...;Your current IP Address;Internal IP;Show Browser Geolocation;ip-api.com;IP-API.com - Free Geolocation API;Query IP/domain;Geolocation API;API documentation;Submit;English",
+					"ro":		"Geolocație Browser;Nu am putut prelua geolocația pentru ;Geolocația dvs. nu este disponibilă;Timeout;Eroare necunoscută;Browser-ul dvs. nu suportă geolocație;IP;Țară;Prefixul țării;Regiune;Cod regiune;Oraș;Adresa;Cod poștal;Latitudine;Longitudine;Fus orar;ISP;Organizație;Număr/nume AS;Server DNS;edns-client-subnet;Rezultatul interogării;Se încarcă...;Adresa dvs. de IP;IP intern;Arată Geolocație Browser;ip-api.com;IP-API.com - API Geolocație gratuit;Interogare IP/domeniu;API Geolocație;Documentație API;Trimite;Română",
+					"ru":		"Вашего нынешнего браузера геолокации;Не удалось получить информацию геолокации для ;Ваше геолокации в настоящее время недоступен;Тайм-аут при получении геолокации;Неизвестная ошибка;Ваш браузер не поддерживает геолокации;IP;Страна;Код страны;Область;Код региона;Город;Адрес;Почтовый Индекс;Широта;Долгота;Временная;Провайдер;Организация;AS номера/имени;DNS-сервер;edns-client-subnet;Результат запроса;Подождите, идет загрузка...;Ваше текущее IP-адрес;Внутренний IP;Показать браузера геолокации;ip-api.com;IP-API.com - Бесплатная API геолокации;Запрос IP/домен;API геолокации;API документация;Представлять;Русский",
+					"fr":		"Votre Géolocalisation actuelle du navigateur;Impossible de récupérer les informations de géolocalisation pour ;Votre Géolocalisation est actuellement indisponible;Timeout tout en obtenant Géolocalisation;Erreur inconnue;Votre navigateur ne supporte pas Géolocalisation;IP;Pays;Code pays;Région;Le code de région;Ville;Adresse;Code postal;Latitude;Longitude;Fuseau horaire;FAI;Organisation;AS numéro/nom;Serveur DNS;edns-client-subnet;Résultat de la requête;Chargement...;Votre adresse IP actuelle;IP interne;Afficher le navigateur Géolocalisation;ip-api.com;IP-API.com - API de géolocalisation gratuit;Interroger IP/domaine;API de géolocalisation;Documentation de l'API;Soumettre;Français",
+					"de":		"Hre aktuellen Browser Geolocation;Kann Geolocation-Informationen abrufen ;Ihre Geolocation ist derzeit nicht verfügbar;Timeout während sich Geolocation;Unbekannter Fehler;Ihr Browser unterstützt keine Geolocation;IP;Land;Landesvorwahl;Region;Regionalcode;City;Anschrift;Plz;Breite;Länge;Zeitzone;Provider;Organisation;AS Nummer/Name;DNS Server;edns-client-subnet;Abfrageergebnis;Wird geladen...;Ihre aktuelle IP-Adresse;Interne IP;Zeige Browser Geolocation;ip-api.com;IP-API.com - Kostenlose Geolocation API;Abfrage IP/Domain;Geolocation API;API-Dokumentation;Einreichen;Deutsch",
+					"es-ES":	"Geolocalización de su navegador actual;No se puede recuperar la información de geolocalización de ;Su geolocalización no está disponible;Tiempo de espera agotado al obtener geolocalización;Error desconocido;Su navegador no soporta geolocalización;IP;País;Código del país;Región;Código de región;Ciudad;Dirección;Código postal;Latitud;Longitud;Zona horaria;Proveedor;Organización;Número/Nombre de AS;Servidor DNS;edns-client-subnet;Resultado de la consulta;Cargando...;Su dirección IP actual;IP interna;Mostrar geolocalización del navegador;ip-api.com;IP-API.com - API de geolocalización gratuito;Consulta IP/dominio;API de geolocalización;Documentación de la API;Presentar;Español",
+					"es-AR":	"Geolocalización de tu navegador web actual;No se pudo obtener la información de geolocalización de ;Tu geolocalización está actualmente no disponible;Tiempo agotado para obtener geolocalización;Error desconocido;Tu navegador web no soporta geolocalización;Dirección IP;País;Código de país;Región;Código de región;Ciudad;Dirección;Código postal;Latitud;Longitud;Huso horario;Proveedor de Internet;Organización;Número y nombre de AS;Servidor DNS;edns-client-subnet;Resultado de la consulta;Cargando…;Tu dirección IP actual;Dirección IP interna;Mostrar geolocalización del navegador web;ip-api.com;IP-API.com - API gratis de geolocalización;Consultar dirección IP / dominio;API de geolocalización;Documentación de API;Enviar;Español (Argentina)",
+					"zh-CN":	"您当前的浏览器地理位置;无法检索地理位置信息 ;你的地理位置是当前不可用;超时同时获得地理位置;未知错误;您的浏览器不支持地理位置;IP;国家;国家代码;区域;区域代码;城市;地址;邮政编码;纬度;经度;时区;ISP;组织;AS号码/名称;DNS服务器;edns-client-subnet;查询结果;加载中...;您当前的IP地址;内部IP;显示浏览器的地理位置;ip-api.com;IP-API.com - 免费地理位置API;查询IP/域名： ;地理定位API;API文档;提交;中国",
+					"ja":		"あなたがお使いのブラウザのジオロケーション;のためのジオロケーション情報を取得できません;あなたのジオロケーションは現在使用できません;タイムアウト地理位置情報を取得中に;不明なエラー;お使いのブラウザは地理位置をサポートしていません;IP;カントリー;国コード;地域;リージョンコード;シティ;アドレス;郵便番号;緯度;経度;タイムゾーン;ISP;組織;番号/名前AS;DNSサーバ;edns-client-subnet;クエリ結果;読み込んでいます...;あなたの現在のIPアドレス;内部IP;ショーブラウザのジオロケーション;ip-api.com;IP-API.com - フリージオロケーションAPI;クエリIP /ドメイン： ;ジオロケーションAPI;APIドキュメント;提出する;日本語"
+				},
+				defaultLanguage = "en",
+				currentLanguage,
+				currentQuery,
+				l,
+				myIp,
+				ie8_fix_div = newElement("div"),
+				protocol = "http:";
+			
+			init();
+
+			window.onhashchange = function() {
+				if(location.hash.substring(1) !== currentQuery) {
+					query();
+				}
+			};
+		</script>
+	</body>
+</html>
