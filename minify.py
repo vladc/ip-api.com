@@ -44,7 +44,10 @@ replacements = {
 	'currentLanguage': 'cl',
 	'init(': 'k(',
 	'footerLanguages': 'i',
-	'contact(': 'cn('
+	'contact(': 'cn(',
+	'mapRadius': 'rn',
+	'calculateZoomLevel': 'cz',
+	'isWatching': 'iw'
 }
 
 f = codecs.open('source.html', 'r', 'utf-8')
