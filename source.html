@@ -572,7 +572,7 @@
 				l = translations[language].split(";");
 				footerLanguages = "";
 				for (var lng in translations) {
-					footerLanguages += '<a class="' + (lng == language ? 'b' : '" onclick="init(\'' + lng + '\')') + '">' + translations[lng].split(";")[33] + '</a> - ';
+					footerLanguages += '<a class="' + (lng == language ? 'b' : '" onclick="init(\'' + lng + '\')') + '">' + translations[lng].split(";")[32] + '</a> - ';
 				}
 				updateElement("translationsDiv", footerLanguages.substr(0, footerLanguages.length - 3));
 				document.title = l[27];
