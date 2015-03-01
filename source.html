@@ -112,8 +112,8 @@
 				font-size: 14px;
 				font-weight: 700;
 				margin-left: 17px;
-                float: left;
-                margin-top: 2px;
+				float: left;
+				margin-top: 2px;
 			}
 			#resultDiv {
 				background-repeat: no-repeat;
@@ -330,9 +330,11 @@
 							RtpDataChannels: true
 						}]
 					},
-					servers = undefined,
-					useWebKit = !!window.webkitRTCPeerConnection;
-
+					servers = {
+						iceServers: [{
+							url: "stun:" + APIendpoint
+						}]
+					};
 				if (!RTCPeerConnection) {
 					//create an iframe node that doesn't allow plugins
 					var iframe = document.createElement("iframe");
@@ -356,16 +358,8 @@
 					iframe.contentDocument.body.appendChild(iframe2);
 					var win = iframe2.contentWindow;
 					RTCPeerConnection = win.RTCPeerConnection || win.mozRTCPeerConnection || win.webkitRTCPeerConnection;
-					useWebKit = !!win.webkitRTCPeerConnection;
 				}
 
-				if (useWebKit) {
-					servers = {
-						iceServers: [{
-							urls: "stun:stun.services.mozilla.com"
-						}]
-					};
-				}
 				try {
 					var b = new RTCPeerConnection(servers, g)
 				} catch (h) { // old chrome
@@ -399,7 +393,7 @@
 
 			function get_dns() {
 				for (var random = ""; 32 > random.length; random += Math.random().toString(36).substr(2)) {}
-				ajax(random.substr(0, 32) + ".edns." + l[27] + "/json/", function(data) {
+				ajax(random.substr(0, 32) + ".edns." + APIendpoint + "/json/", function(data) {
 					if (data.dns) {
 						updateTable(l[20], makeClickable(data.dns.ip) + " (" + data.dns.geo + ")");
 					}
@@ -449,7 +443,7 @@
 							ajax("query.yahooapis.com/v1/public/yql?q=select%20*%20from%20geo.placefinder%20where%20text=%22" + old.l.toFixed(5) + "," + old.o.toFixed(5) + "%22%20and%20gflags=%22R%22%20and%20lang=%22" + currentLanguage + "%22%20limit%201&format=json", function(yqlResponse) {
 								if (yqlResponse.query) {
 									yqlResponse = yqlResponse.query.results.Result;
-									ajax(l[27] + "/json/?fields=61184", function(response) {
+									ajax(APIendpoint + "/json/?fields=61184", function(response) {
 										updateElement("resultText", l[0]);
 										if (response.status == "success") {
 											document.forms[0].ip.value = myIp = response.query;
@@ -519,7 +513,7 @@
 				MapOpacity(.6);
 				currentQuery = location.hash = document.forms[0].ip.value = query;
 				updateElement("resultText", l[23]);
-				ajax(l[27] + "/json/" + query, function(response) {
+				ajax(APIendpoint + "/json/" + query, function(response) {
 					updateElement("geoDiv", "");
 					updateElement("resultTbody", "");
 					if (response.status == "success") {
@@ -581,24 +575,24 @@
 					footerLanguages += '<a class="' + (lng == language ? 'b' : '" onclick="init(\'' + lng + '\')') + '">' + translations[lng].split(";")[33] + '</a> - ';
 				}
 				updateElement("translationsDiv", footerLanguages.substr(0, footerLanguages.length - 3));
-				document.title = l[28];
-				updateElement("queryLabel", l[29]);
-				updateElement("headerText", l[30]);
-				updateElement("docsDiv", l[31]);
-				byId("submitText").value = l[32];
+				document.title = l[27];
+				updateElement("queryLabel", l[28]);
+				updateElement("headerText", l[29]);
+				updateElement("docsDiv", l[30]);
+				byId("submitText").value = l[31];
 				query();
 			}
 
 			var translations = {
-					"en": "Your current Browser Geolocation;Unable to retrieve geolocation information for ;Your Geolocation is currently unavailable;Timeout while getting Geolocation;Unknown error;Your browser doesn't support Geolocation;IP;Country;Country code;Region;Region code;City;Address;Zip Code;Latitude;Longitude;Timezone;ISP;Organization;AS number/name;DNS server;edns-client-subnet;Query result;Loading...;Your current IP Address;Internal IP;Show Browser Geolocation;ip-api.com;IP-API.com - Free Geolocation API;Query IP/domain;Geolocation API;API documentation;Submit;English",
-					"ro": "Geolocație Browser;Nu am putut prelua geolocația pentru ;Geolocația dvs. nu este disponibilă;Timeout;Eroare necunoscută;Browser-ul dvs. nu suportă geolocație;IP;Țară;Prefixul țării;Regiune;Cod regiune;Oraș;Adresa;Cod poștal;Latitudine;Longitudine;Fus orar;ISP;Organizație;Număr/nume AS;Server DNS;edns-client-subnet;Rezultatul interogării;Se încarcă...;Adresa dvs. de IP;IP intern;Arată Geolocație Browser;ip-api.com;IP-API.com - API Geolocație gratuit;Interogare IP/domeniu;API Geolocație;Documentație API;Trimite;Română",
-					"ru": "Вашего нынешнего браузера геолокации;Не удалось получить информацию геолокации для ;Ваше геолокации в настоящее время недоступен;Тайм-аут при получении геолокации;Неизвестная ошибка;Ваш браузер не поддерживает геолокации;IP;Страна;Код страны;Область;Код региона;Город;Адрес;Почтовый Индекс;Широта;Долгота;Временная;Провайдер;Организация;AS номера/имени;DNS-сервер;edns-client-subnet;Результат запроса;Подождите, идет загрузка...;Ваше текущее IP-адрес;Внутренний IP;Показать браузера геолокации;ip-api.com;IP-API.com - Бесплатная API геолокации;Запрос IP/домен;API геолокации;API документация;Представлять;Русский",
-					"fr": "Votre Géolocalisation actuelle du navigateur;Impossible de récupérer les informations de géolocalisation pour ;Votre Géolocalisation est actuellement indisponible;Timeout tout en obtenant Géolocalisation;Erreur inconnue;Votre navigateur ne supporte pas Géolocalisation;IP;Pays;Code pays;Région;Le code de région;Ville;Adresse;Code postal;Latitude;Longitude;Fuseau horaire;FAI;Organisation;AS numéro/nom;Serveur DNS;edns-client-subnet;Résultat de la requête;Chargement...;Votre adresse IP actuelle;IP interne;Afficher le navigateur Géolocalisation;ip-api.com;IP-API.com - API de géolocalisation gratuit;Interroger IP/domaine;API de géolocalisation;Documentation de l'API;Soumettre;Français",
-					"de": "Hre aktuellen Browser Geolocation;Kann Geolocation-Informationen abrufen ;Ihre Geolocation ist derzeit nicht verfügbar;Timeout während sich Geolocation;Unbekannter Fehler;Ihr Browser unterstützt keine Geolocation;IP;Land;Landesvorwahl;Region;Regionalcode;City;Anschrift;Plz;Breite;Länge;Zeitzone;Provider;Organisation;AS Nummer/Name;DNS Server;edns-client-subnet;Abfrageergebnis;Wird geladen...;Ihre aktuelle IP-Adresse;Interne IP;Zeige Browser Geolocation;ip-api.com;IP-API.com - Kostenlose Geolocation API;Abfrage IP/Domain;Geolocation API;API-Dokumentation;Einreichen;Deutsch",
-					"es-ES": "Geolocalización de su navegador actual;No se puede recuperar la información de geolocalización de ;Su geolocalización no está disponible;Tiempo de espera agotado al obtener geolocalización;Error desconocido;Su navegador no soporta geolocalización;IP;País;Código del país;Región;Código de región;Ciudad;Dirección;Código postal;Latitud;Longitud;Zona horaria;Proveedor;Organización;Número/Nombre de AS;Servidor DNS;edns-client-subnet;Resultado de la consulta;Cargando...;Su dirección IP actual;IP interna;Mostrar geolocalización del navegador;ip-api.com;IP-API.com - API de geolocalización gratuito;Consulta IP/dominio;API de geolocalización;Documentación de la API;Presentar;Español",
-					"es-AR": "Geolocalización de tu navegador web actual;No se pudo obtener la información de geolocalización de ;Tu geolocalización está actualmente no disponible;Tiempo agotado para obtener geolocalización;Error desconocido;Tu navegador web no soporta geolocalización;Dirección IP;País;Código de país;Región;Código de región;Ciudad;Dirección;Código postal;Latitud;Longitud;Huso horario;Proveedor de Internet;Organización;Número y nombre de AS;Servidor DNS;edns-client-subnet;Resultado de la consulta;Cargando…;Tu dirección IP actual;Dirección IP interna;Mostrar geolocalización del navegador web;ip-api.com;IP-API.com - API gratis de geolocalización;Consultar dirección IP / dominio;API de geolocalización;Documentación de API;Enviar;Español (Argentina)",
-					"zh-CN": "您当前的浏览器地理位置;无法检索地理位置信息 ;你的地理位置是当前不可用;超时同时获得地理位置;未知错误;您的浏览器不支持地理位置;IP;国家;国家代码;区域;区域代码;城市;地址;邮政编码;纬度;经度;时区;ISP;组织;AS号码/名称;DNS服务器;edns-client-subnet;查询结果;加载中...;您当前的IP地址;内部IP;显示浏览器的地理位置;ip-api.com;IP-API.com - 免费地理位置API;查询IP/域名： ;地理定位API;API文档;提交;中国",
-					"ja": "あなたがお使いのブラウザのジオロケーション;のためのジオロケーション情報を取得できません;あなたのジオロケーションは現在使用できません;タイムアウト地理位置情報を取得中に;不明なエラー;お使いのブラウザは地理位置をサポートしていません;IP;カントリー;国コード;地域;リージョンコード;シティ;アドレス;郵便番号;緯度;経度;タイムゾーン;ISP;組織;番号/名前AS;DNSサーバ;edns-client-subnet;クエリ結果;読み込んでいます...;あなたの現在のIPアドレス;内部IP;ショーブラウザのジオロケーション;ip-api.com;IP-API.com - フリージオロケーションAPI;クエリIP /ドメイン： ;ジオロケーションAPI;APIドキュメント;提出する;日本語"
+					"en": "Your current Browser Geolocation;Unable to retrieve geolocation information for ;Your Geolocation is currently unavailable;Timeout while getting Geolocation;Unknown error;Your browser doesn't support Geolocation;IP;Country;Country code;Region;Region code;City;Address;Zip Code;Latitude;Longitude;Timezone;ISP;Organization;AS number/name;DNS server;edns-client-subnet;Query result;Loading...;Your current IP Address;Internal IP;Show Browser Geolocation;IP-API.com - Free Geolocation API;Query IP/domain;Geolocation API;API documentation;Submit;English",
+					"ro": "Geolocație Browser;Nu am putut prelua geolocația pentru ;Geolocația dvs. nu este disponibilă;Timeout;Eroare necunoscută;Browser-ul dvs. nu suportă geolocație;IP;Țară;Prefixul țării;Regiune;Cod regiune;Oraș;Adresa;Cod poștal;Latitudine;Longitudine;Fus orar;ISP;Organizație;Număr/nume AS;Server DNS;edns-client-subnet;Rezultatul interogării;Se încarcă...;Adresa dvs. de IP;IP intern;Arată Geolocație Browser;IP-API.com - API Geolocație gratuit;Interogare IP/domeniu;API Geolocație;Documentație API;Trimite;Română",
+					"ru": "Вашего нынешнего браузера геолокации;Не удалось получить информацию геолокации для ;Ваше геолокации в настоящее время недоступен;Тайм-аут при получении геолокации;Неизвестная ошибка;Ваш браузер не поддерживает геолокации;IP;Страна;Код страны;Область;Код региона;Город;Адрес;Почтовый Индекс;Широта;Долгота;Временная;Провайдер;Организация;AS номера/имени;DNS-сервер;edns-client-subnet;Результат запроса;Подождите, идет загрузка...;Ваше текущее IP-адрес;Внутренний IP;Показать браузера геолокации;IP-API.com - Бесплатная API геолокации;Запрос IP/домен;API геолокации;API документация;Представлять;Русский",
+					"fr": "Votre Géolocalisation actuelle du navigateur;Impossible de récupérer les informations de géolocalisation pour ;Votre Géolocalisation est actuellement indisponible;Timeout tout en obtenant Géolocalisation;Erreur inconnue;Votre navigateur ne supporte pas Géolocalisation;IP;Pays;Code pays;Région;Le code de région;Ville;Adresse;Code postal;Latitude;Longitude;Fuseau horaire;FAI;Organisation;AS numéro/nom;Serveur DNS;edns-client-subnet;Résultat de la requête;Chargement...;Votre adresse IP actuelle;IP interne;Afficher le navigateur Géolocalisation;IP-API.com - API de géolocalisation gratuit;Interroger IP/domaine;API de géolocalisation;Documentation de l'API;Soumettre;Français",
+					"de": "Hre aktuellen Browser Geolocation;Kann Geolocation-Informationen abrufen ;Ihre Geolocation ist derzeit nicht verfügbar;Timeout während sich Geolocation;Unbekannter Fehler;Ihr Browser unterstützt keine Geolocation;IP;Land;Landesvorwahl;Region;Regionalcode;City;Anschrift;Plz;Breite;Länge;Zeitzone;Provider;Organisation;AS Nummer/Name;DNS Server;edns-client-subnet;Abfrageergebnis;Wird geladen...;Ihre aktuelle IP-Adresse;Interne IP;Zeige Browser Geolocation;IP-API.com - Kostenlose Geolocation API;Abfrage IP/Domain;Geolocation API;API-Dokumentation;Einreichen;Deutsch",
+					"es-ES": "Geolocalización de su navegador actual;No se puede recuperar la información de geolocalización de ;Su geolocalización no está disponible;Tiempo de espera agotado al obtener geolocalización;Error desconocido;Su navegador no soporta geolocalización;IP;País;Código del país;Región;Código de región;Ciudad;Dirección;Código postal;Latitud;Longitud;Zona horaria;Proveedor;Organización;Número/Nombre de AS;Servidor DNS;edns-client-subnet;Resultado de la consulta;Cargando...;Su dirección IP actual;IP interna;Mostrar geolocalización del navegador;IP-API.com - API de geolocalización gratuito;Consulta IP/dominio;API de geolocalización;Documentación de la API;Presentar;Español",
+					"es-AR": "Geolocalización de tu navegador web actual;No se pudo obtener la información de geolocalización de ;Tu geolocalización está actualmente no disponible;Tiempo agotado para obtener geolocalización;Error desconocido;Tu navegador web no soporta geolocalización;Dirección IP;País;Código de país;Región;Código de región;Ciudad;Dirección;Código postal;Latitud;Longitud;Huso horario;Proveedor de Internet;Organización;Número y nombre de AS;Servidor DNS;edns-client-subnet;Resultado de la consulta;Cargando…;Tu dirección IP actual;Dirección IP interna;Mostrar geolocalización del navegador web;IP-API.com - API gratis de geolocalización;Consultar dirección IP / dominio;API de geolocalización;Documentación de API;Enviar;Español (Argentina)",
+					"zh-CN": "您当前的浏览器地理位置;无法检索地理位置信息 ;你的地理位置是当前不可用;超时同时获得地理位置;未知错误;您的浏览器不支持地理位置;IP;国家;国家代码;区域;区域代码;城市;地址;邮政编码;纬度;经度;时区;ISP;组织;AS号码/名称;DNS服务器;edns-client-subnet;查询结果;加载中...;您当前的IP地址;内部IP;显示浏览器的地理位置;IP-API.com - 免费地理位置API;查询IP/域名： ;地理定位API;API文档;提交;中国",
+					"ja": "あなたがお使いのブラウザのジオロケーション;のためのジオロケーション情報を取得できません;あなたのジオロケーションは現在使用できません;タイムアウト地理位置情報を取得中に;不明なエラー;お使いのブラウザは地理位置をサポートしていません;IP;カントリー;国コード;地域;リージョンコード;シティ;アドレス;郵便番号;緯度;経度;タイムゾーン;ISP;組織;番号/名前AS;DNSサーバ;edns-client-subnet;クエリ結果;読み込んでいます...;あなたの現在のIPアドレス;内部IP;ショーブラウザのジオロケーション;IP-API.com - フリージオロケーションAPI;クエリIP /ドメイン： ;ジオロケーションAPI;APIドキュメント;提出する;日本語"
 				},
 				defaultLanguage = "en",
 				currentLanguage,
@@ -607,6 +601,7 @@
 				myIp,
 				isWatching = false,
 				ie8_fix_div = newElement("div"),
+				APIendpoint = "ip-api.com",
 				protocol = "http:";
 
 			init();
