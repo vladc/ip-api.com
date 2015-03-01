@@ -47,7 +47,8 @@ replacements = {
 	'contact(': 'cn(',
 	'mapRadius': 'rn',
 	'calculateZoomLevel': 'cz',
-	'isWatching': 'iw'
+	'isWatching': 'iw',
+	'APIendpoint': 'ep'
 }
 
 f = codecs.open('source.html', 'r', 'utf-8')
@@ -93,7 +94,7 @@ post = {
 req = urlopen(Request('http://refresh-sf.herokuapp.com/html/', data=urlencode(post)))
 contents = json.loads(req.read())['code']
 
-contents += "<!-- https://github.com/vladc/ip-api.com -->"
+contents += "<!--https://github.com/vladc/ip-api.com-->"
 out = codecs.open('index.html', 'w', 'utf-8')
 out.write(contents)
 out.close()
