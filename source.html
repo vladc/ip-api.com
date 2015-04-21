@@ -185,6 +185,10 @@
 				border: 0 none;
 				padding: 0;
 			}
+			.mobile {
+				background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAQCAYAAADAvYV+AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGtJREFUeNpi/P//P0Nubu5mBgJg8uTJvow5OTkgha1AfAKPWgsgrmaBckAK8ZnuCyKYGEgAo4qRAQt6WBJtMisr62ZsNIbJwLhHNh2dBqUfVJOLioo2Y6NhAJaQwKZATccAsFTJSEoSBQgwAKTWJmjZzTsEAAAAAElFTkSuQmCC') no-repeat center left;
+				padding-left: 16px;
+			}
 		</style>
 	</head>
 	<body>
@@ -293,8 +297,8 @@
 				}
 			}
 
-			function makeClickable(ip) {
-				return "<a href='#" + ip + "'>" + ip + "</a>"
+			function makeClickable(ip, mobile) {
+				return "<a "+ (mobile ? "class='mobile' title='mobile connection'" : "") + " href='#" + ip + "'>" + ip + "</a>"
 			}
 
 			function ie8_fix(element, html) {
@@ -441,7 +445,7 @@
 							ajax("query.yahooapis.com/v1/public/yql?q=select%20*%20from%20geo.placefinder%20where%20text=%22" + old.l.toFixed(5) + "," + old.o.toFixed(5) + "%22%20and%20gflags=%22R%22%20and%20lang=%22" + currentLanguage + "%22%20limit%201&format=json", function(yqlResponse) {
 								if (yqlResponse.query) {
 									yqlResponse = yqlResponse.query.results.Result;
-									ajax(APIendpoint + "/json/?fields=61184", function(response) {
+									ajax(APIendpoint + "/json/?fields=126720", function(response) {
 										updateElement("resultText", l[0]);
 										if (response.status == "success") {
 											document.forms[0].ip.value = myIp = response.query;
@@ -449,7 +453,7 @@
 											zoom = calculateZoomLevel(geo.coords.accuracy);
 											mapRadius = Math.max(15, parseInt(geo.coords.accuracy * (1.19 / Math.pow(2, 17 - zoom))));
 											setMap(old.l.toFixed(5), old.o.toFixed(5), zoom, mapRadius);
-											updateTable(l[6], makeClickable(response.query));
+											updateTable(l[6], makeClickable(response.query, response.mobile));
 											updateTable(l[7], yqlResponse.country);
 											updateTable(l[8], yqlResponse.countrycode);
 											yqlResponse.state != null ? updateTable(l[9], yqlResponse.state) : (yqlResponse.county != null ? updateTable(l[9], yqlResponse.county) : updateTable(l[9], ""));
@@ -511,13 +515,13 @@
 				MapOpacity(.6);
 				currentQuery = location.hash = document.forms[0].ip.value = query;
 				updateElement("resultText", l[23]);
-				ajax(APIendpoint + "/json/" + query, function(response) {
+				ajax(APIendpoint + "/json/" + query + "?fields=126975", function(response) {
 					updateElement("geoDiv", "");
 					updateElement("resultTbody", "");
 					if (response.status == "success") {
 						zoom = response.zip != "" ? 13 : response.city != "" ? 12 : 6;
 						setMap(response.lat, response.lon, zoom);
-						updateTable(l[6], makeClickable(response.query), "qr");
+						updateTable(l[6], makeClickable(response.query, response.mobile), "qr");
 						updateTable(l[7], response.country);
 						updateTable(l[8], response.countryCode);
 						updateTable(l[9], response.regionName);
