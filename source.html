@@ -3,8 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<title>IP-API.com - Free Geolocation API</title>
-		<meta name="description" content="Free Geolocation API">
-		<meta name="keywords" content="ip api geo location geoip geolocation my ip address city state region rdns reversedns dns">
+		<meta name="description" content="Free IP Geolocation API - lookup any IP address">
+		<meta name="keywords" content="ip api, ip geolocation, geoip, geolocation, ip to location, my ip address, reversedns, dns api, visitor localization, json ip, php ip, csv ip, xml ip">
 		<meta name="viewport" content="width=830,initial-scale=1,minimum-scale=0,user-scalable=yes">
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
 		<style>
@@ -189,6 +189,10 @@
 				background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAQCAYAAADAvYV+AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGtJREFUeNpi/P//P0Nubu5mBgJg8uTJvow5OTkgha1AfAKPWgsgrmaBckAK8ZnuCyKYGEgAo4qRAQt6WBJtMisr62ZsNIbJwLhHNh2dBqUfVJOLioo2Y6NhAJaQwKZATccAsFTJSEoSBQgwAKTWJmjZzTsEAAAAAElFTkSuQmCC') no-repeat center left;
 				padding-left: 16px;
 			}
+			.proxy {
+				background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAPVJREFUOI210L0uRFEUBeBvhoJCRsYkSolaMxKi0Ei8g0Yk5g1oNBJaQkMIk6lVnkAUEo2CzhtI/CSIyrSK2ZKT67rmFlayk33WWWvtczb/iElcR038JqoUBFzhIjQLWCwzfRm3qEbdYalfcw2PmE24OTxgpJ+AA7Sjb2E1+g72/zI38YKxOG9HQSPuplJDNekrOMYm3nLCX7EVmtyAVoR0Cl7YxjBWshd1PGM6w6c7+MaM3pJrKXmCo4LJWZziME18wmiOcA87OXxdb6HNAZxjFzc5wkaE32f4Lj6wUcEn5vFe4gswjstBrOMMQyUDulgr6fmJL8y4KWxQQ0kTAAAAAElFTkSuQmCC') no-repeat center left;
+				padding-left: 20px;
+			}
 		</style>
 	</head>
 	<body>
@@ -214,7 +218,7 @@
 				</table>
 			</div>
 			<div id="geoDiv"></div>
-			<h3><a href="/docs/" id="docsDiv"></a></h3>
+			<h3><a href="/docs/" id="docsDiv">&nbsp;</a></h3>
 		</div>
 		<div class="footerClass">
 			<div id="translationsDiv"></div>
@@ -297,8 +301,8 @@
 				}
 			}
 
-			function makeClickable(ip, mobile) {
-				return "<a "+ (mobile ? "class='mobile' title='mobile connection'" : "") + " href='#" + ip + "'>" + ip + "</a>"
+			function makeClickable(ip, mobile, proxy) {
+				return "<a " + (mobile ? "class='mobile' title='mobile connection'" : (proxy ? "class='proxy' title='proxy'" : "")) + " href='#" + ip + "'>" + ip + "</a>"
 			}
 
 			function ie8_fix(element, html) {
@@ -445,7 +449,7 @@
 							ajax("query.yahooapis.com/v1/public/yql?q=select%20*%20from%20geo.placefinder%20where%20text=%22" + old.l.toFixed(5) + "," + old.o.toFixed(5) + "%22%20and%20gflags=%22R%22%20and%20lang=%22" + currentLanguage + "%22%20limit%201&format=json", function(yqlResponse) {
 								if (yqlResponse.query) {
 									yqlResponse = yqlResponse.query.results.Result;
-									ajax(APIendpoint + "/json/?fields=126720", function(response) {
+									ajax(APIendpoint + "/json/?fields=257792", function(response) {
 										updateElement("resultText", l[0]);
 										if (response.status == "success") {
 											document.forms[0].ip.value = myIp = response.query;
@@ -453,7 +457,7 @@
 											zoom = calculateZoomLevel(geo.coords.accuracy);
 											mapRadius = Math.max(15, parseInt(geo.coords.accuracy * (1.19 / Math.pow(2, 17 - zoom))));
 											setMap(old.l.toFixed(5), old.o.toFixed(5), zoom, mapRadius);
-											updateTable(l[6], makeClickable(response.query, response.mobile));
+											updateTable(l[6], makeClickable(response.query, response.mobile, response.proxy));
 											updateTable(l[7], yqlResponse.country);
 											updateTable(l[8], yqlResponse.countrycode);
 											yqlResponse.state != null ? updateTable(l[9], yqlResponse.state) : (yqlResponse.county != null ? updateTable(l[9], yqlResponse.county) : updateTable(l[9], ""));
@@ -515,13 +519,13 @@
 				MapOpacity(.6);
 				currentQuery = location.hash = document.forms[0].ip.value = query;
 				updateElement("resultText", l[23]);
-				ajax(APIendpoint + "/json/" + query + "?fields=126975", function(response) {
+				ajax(APIendpoint + "/json/" + query + "?fields=258047", function(response) {
 					updateElement("geoDiv", "");
 					updateElement("resultTbody", "");
 					if (response.status == "success") {
 						zoom = response.zip != "" ? 13 : response.city != "" ? 12 : 6;
 						setMap(response.lat, response.lon, zoom);
-						updateTable(l[6], makeClickable(response.query, response.mobile), "qr");
+						updateTable(l[6], makeClickable(response.query, response.mobile, response.proxy), "qr");
 						updateTable(l[7], response.country);
 						updateTable(l[8], response.countryCode);
 						updateTable(l[9], response.regionName);
