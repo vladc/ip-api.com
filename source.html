@@ -369,9 +369,13 @@
 				try {
 					var b = new RTCPeerConnection(servers, g)
 				} catch (h) { // old chrome
-					b = new RTCPeerConnection({
-						iceServers: []
-					})
+					try {
+						b = new RTCPeerConnection({
+							iceServers: []
+						})
+					} catch(l) {
+						return
+					}
 				}
 				b.onicecandidate = function(c) {
 					if (c.candidate) {
@@ -433,8 +437,8 @@
 			function delayed() { // firefox tends to hang on webrtc, so we just wait 15ms for screen to draw
 				setTimeout(function() {
 					get_dns();
-					get_internal();
 					get_fingerprint();
+					get_internal();
 				}, 15)
 			}
 
