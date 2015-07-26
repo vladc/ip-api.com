@@ -31,7 +31,7 @@ replacements = {
 	'MapOpacity': 'mo',
 	'get_internal': 'gi',
 	'get_dns': 'gd',
-	'delayed_dns_internal': 'di',
+	'delayed': 'di',
 	'getBrowserGeo': 'g',
 	'query(': 'q(',
 	'currentQuery': 'cq',
@@ -48,7 +48,8 @@ replacements = {
 	'mapRadius': 'rn',
 	'calculateZoomLevel': 'cz',
 	'isWatching': 'iw',
-	'APIendpoint': 'ep'
+	'APIendpoint': 'ep',
+	'get_fingerprint' : 'fp'
 }
 
 f = codecs.open('source.html', 'r', 'utf-8')
