@@ -5,7 +5,7 @@
 		<title>IP-API.com - Free Geolocation API</title>
 		<meta name="description" content="Free IP Geolocation API - lookup any IP address">
 		<meta name="keywords" content="ip api, ip geolocation, geoip, geolocation, ip to location, my ip address, reversedns, dns api, visitor localization, json ip, php ip, csv ip, xml ip">
-		<meta name="viewport" content="width=930,initial-scale=1,minimum-scale=0,user-scalable=yes">
+		<meta name="viewport" content="width=930,initial-scale=0.7,minimum-scale=0,user-scalable=yes">
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
 		<style>
 			html {
@@ -206,7 +206,7 @@
 						<label for="ip" id="queryLabel"></label>
 					</legend>
 					<div>
-						<input id="ip" type="text" autofocus spellcheck="false">
+						<input id="ip" type="text" spellcheck="false">
 					</div>
 					<input type="submit" id="submitText">
 				</fieldset>
@@ -243,7 +243,13 @@
 
 				req.onreadystatechange = function() {
 					if (req.readyState == 4) {
-						callback(jsonParse(req.responseText));
+						if (req.status == 200) {
+							callback(jsonParse(req.responseText));
+						} else {
+							unSetMap();
+							updateElement("resultText", l[4]);
+							updateElement("resultTbody", url + ' returned HTTP code ' + req.status);
+						}
 					}
 				}
 				req.open("GET", url, true);
@@ -508,7 +514,11 @@
 											//delayed();
 										} else {
 											unSetMap();
-											updateElement("resultTbody", l[1] + response.query + " (" + response.message + ")");
+											if (response.status == "fail") { 
+												updateElement("resultTbody", l[1] + response.query + " (" + response.message + ")");
+											} else {
+												updateElement("resultTbody", l[4]);
+											}
 										}
 									}, 1);
 								} else {
@@ -582,10 +592,14 @@
 						} else {
 							updateElement("resultText", l[22]);
 						}
-					} else {
+					} else { 
 						unSetMap();
-						updateElement("resultTbody", l[1] + response.query + " (" + response.message + ")");
 						updateElement("resultText", l[22]);
+						if (response.status == "fail") { 
+							updateElement("resultTbody", l[1] + response.query + " (" + response.message + ")");
+						} else {
+							updateElement("resultTbody", l[4]);
+						}
 					}
 				}, 1)
 			}
