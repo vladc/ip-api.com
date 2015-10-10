@@ -242,14 +242,8 @@
 				var req = getRequest();
 
 				req.onreadystatechange = function() {
-					if (req.readyState == 4) {
-						if (req.status == 200) {
-							callback(jsonParse(req.responseText));
-						} else {
-							unSetMap();
-							updateElement("resultText", l[4]);
-							updateElement("resultTbody", url + ' returned HTTP code ' + req.status);
-						}
+					if (req.readyState == 4 && req.status == 200) {
+						callback(jsonParse(req.responseText));
 					}
 				}
 				req.open("GET", url, true);
