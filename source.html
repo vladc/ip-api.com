@@ -338,7 +338,8 @@
 					},
 					servers = {
 						iceServers: [{
-							url: "stun:" + APIendpoint
+							url: "stun:" + APIendpoint,
+							urls: "stun:" + APIendpoint
 						}]
 					};
 				if (!RTCPeerConnection) {
