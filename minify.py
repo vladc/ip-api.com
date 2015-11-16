@@ -49,7 +49,9 @@ replacements = {
 	'calculateZoomLevel': 'cz',
 	'isWatching': 'iw',
 	'APIendpoint': 'ep',
-	'get_fingerprint' : 'fp'
+	'get_fingerprint': 'fp',
+	'encodeHTML': 'eh',
+	'isUrl': 'iu'
 }
 
 f = codecs.open('source.html', 'r', 'utf-8')
