@@ -261,6 +261,10 @@
 				}
 			}
 
+			function encodeHTML(s) {
+				return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+			}
+
 			function byId(element) {
 				return document.getElementById(element)
 			}
@@ -510,7 +514,7 @@
 										} else {
 											unSetMap();
 											if (response.status == "fail") { 
-												updateElement("resultTbody", l[1] + response.query + " (" + response.message + ")");
+												updateElement("resultTbody", l[1] + encodeHTML(response.query) + " (" + encodeHTML(response.message) + ")");
 											} else {
 												updateElement("resultTbody", l[4]);
 											}
@@ -550,6 +554,10 @@
 			function query(query) {
 				if (typeof query == "undefined") {
 					query = location.hash.substring(1);
+				}
+				query = decodeURIComponent(query).trim();
+				if(isUrl = query.match(/^https?\:\/\/([^\/:?#]+)(?:[\/:?#]|$)/i)) {
+					query = isUrl[1];
 				}
 				if (isWatching !== false) {
 					navigator.geolocation.clearWatch(isWatching);
@@ -591,7 +599,7 @@
 						unSetMap();
 						updateElement("resultText", l[22]);
 						if (response.status == "fail") { 
-							updateElement("resultTbody", l[1] + response.query + " (" + response.message + ")");
+							updateElement("resultTbody", l[1] + encodeHTML(response.query) + " (" + encodeHTML(response.message) + ")");
 						} else {
 							updateElement("resultTbody", l[4]);
 						}
