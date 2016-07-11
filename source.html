@@ -124,10 +124,6 @@
 				background: #fff;
 				background: rgba(255, 255, 255, .7);
 			}
-			#geoDiv {
-				margin-top: 7px;
-				font-weight: 700;
-			}
 			input:hover {
 				-moz-box-shadow: 0 0 3px #999;
 				-webkit-box-shadow: 0 0 3px #999;
@@ -217,12 +213,11 @@
 					<tbody id="resultTbody"></tbody>
 				</table>
 			</div>
-			<div id="geoDiv"></div>
 			<h3><a href="/docs/" id="docsDiv">&nbsp;</a></h3>
 		</div>
 		<div class="footerClass">
 			<div id="translationsDiv"></div>
-			&copy; 2015 IP-API.com |
+			&copy; 2016 IP-API.com |
 			<a href="/docs/">api</a> |
 			<a href="https://signup.ip-api.com/">pro</a> |
 			<a onclick="contact()">contact</a>
@@ -316,9 +311,19 @@
 
 			function nullFunction() {}
 
-			function setMap(lat, lon, zoom, accuracy) {
-				// weight for radius is an ugly hack but it works 
-				byId("resultDiv").style.backgroundImage = "url('" + protocol + "//maps.googleapis.com/maps/api/staticmap?key=AIzaSyAjh0Pdk6dasNa6f58zkd86cOrtNxbHQHE&center=" + lat + "," + lon + "&zoom=" + zoom + "&format=jpg&size=320x349&language=" + currentLanguage + (accuracy ? "&path=weight:" + accuracy + '|' + lat + ',' + lon + '|' + lat + ',' + (lon + 1) : "") + "')";
+			function calculateZoomLevel(accuracy) {
+				var metersPerPixel = 10;
+				var zoomLevel = 2;
+				while ((metersPerPixel * 320) > accuracy) {
+					metersPerPixel /= 2;
+					zoomLevel++;
+				}
+				return Math.min(16, zoomLevel);
+			}
+
+			function setMap(lat, lon, accuracy) {
+				zoom = calculateZoomLevel(accuracy);
+				byId("resultDiv").style.backgroundImage = "url('" + protocol + "//maps.googleapis.com/maps/api/staticmap?key=AIzaSyAjh0Pdk6dasNa6f58zkd86cOrtNxbHQHE&center=" + lat + "," + lon + "&zoom=" + zoom + "&format=jpg&size=320x349&language=" + currentLanguage + "&path=color:0x3af1ad30|weight:" + Math.max(15, parseInt(accuracy * (1190 / Math.pow(2, 17 - zoom)))) + '|' + lat + ',' + lon + '|' + lat + ',' + (lon + 0.00001) + "')";
 				MapOpacity(1);
 			}
 
@@ -455,102 +460,6 @@
 				}, 15)
 			}
 
-			function calculateZoomLevel(accuracy) {
-				var metersPerPixel = 10000;
-				var zoomLevel = 1;
-				while ((metersPerPixel * 320) > accuracy) {
-					metersPerPixel /= 2;
-					zoomLevel++;
-				}
-				return Math.min(16, zoomLevel);
-			}
-
-			function getBrowserGeo() {
-				currentQuery = location.hash = "";
-				MapOpacity(.6);
-				updateElement("resultText", l[23]);
-				if (navigator.geolocation) {
-					if (isWatching !== false) {
-						navigator.geolocation.clearWatch(isWatching);
-						isWatching = false;
-					}
-					updateElement("geoDiv", "");
-					var old = {
-						l: 0,
-						o: 0
-					};
-					isWatching = navigator.geolocation.watchPosition(function(geo) {
-						if (geo.coords.latitude !== old.l && geo.coords.longitude !== old.o) {
-							old = {
-								l: geo.coords.latitude,
-								o: geo.coords.longitude
-							};
-							ajax("query.yahooapis.com/v1/public/yql?q=select%20*%20from%20geo.placefinder%20where%20text=%22" + old.l.toFixed(5) + "," + old.o.toFixed(5) + "%22%20and%20gflags=%22R%22%20and%20lang=%22" + currentLanguage + "%22%20limit%201&format=json", function(yqlResponse) {
-								if (yqlResponse.query) {
-									yqlResponse = yqlResponse.query.results.Result;
-									ajax(APIendpoint + "/json/?fields=257792", function(response) {
-										updateElement("resultText", l[0]);
-										if (response.status == "success") {
-											document.forms[0].ip.value = myIp = response.query;
-											updateElement("resultTbody", "");
-											zoom = calculateZoomLevel(geo.coords.accuracy);
-											mapRadius = Math.max(15, parseInt(geo.coords.accuracy * (1.19 / Math.pow(2, 17 - zoom))));
-											setMap(old.l.toFixed(5), old.o.toFixed(5), zoom, mapRadius);
-											updateTable(l[6], makeClickable(response.query, response.mobile, response.proxy));
-											updateTable(l[7], yqlResponse.country);
-											updateTable(l[8], yqlResponse.countrycode);
-											yqlResponse.state != null ? updateTable(l[9], yqlResponse.state) : (yqlResponse.county != null ? updateTable(l[9], yqlResponse.county) : updateTable(l[9], ""));
-											yqlResponse.statecode != null ? updateTable(l[10], yqlResponse.statecode) : (yqlResponse.countycode != null ? updateTable(l[10], yqlResponse.countycode) : updateTable(l[10], ""));
-											updateTable(l[11], yqlResponse.city);
-											updateTable(l[12], (yqlResponse.house == null ? "" : yqlResponse.house + " ") + (yqlResponse.street == null ? "" : yqlResponse.street + " ") + (yqlResponse.neighborhood == null ? "" : yqlResponse.neighborhood));
-											updateTable(l[13], yqlResponse.postal);
-											updateTable(l[14], old.l.toFixed(5));
-											updateTable(l[15], old.o.toFixed(5));
-											updateTable(l[16], response.timezone);
-											updateTable(l[17], response.isp);
-											updateTable(l[18], response.org);
-											updateTable(l[19], response.as);
-											//delayed();
-										} else {
-											unSetMap();
-											if (response.status == "fail") { 
-												updateElement("resultTbody", l[1] + encodeHTML(response.query) + " (" + encodeHTML(response.message) + ")");
-											} else {
-												updateElement("resultTbody", l[4]);
-											}
-										}
-									}, 1);
-								} else {
-									unSetMap();
-									updateElement("resultTbody", l[1] + old.l + "," + old.o);
-									updateElement("resultText", l[22]);
-								}
-							})
-						}
-					}, function(error) {
-						unSetMap();
-						updateElement("resultText", l[0]);
-						switch (error.code) {
-							case error.TIMEOUT:
-								updateElement("resultTbody", l[3]);
-								break;
-							case error.POSITION_UNAVAILABLE:
-								updateElement("resultTbody", l[2]);
-								break;
-							default:
-							case error.UNKNOWN_ERROR:
-								updateElement("resultTbody", l[4])
-						}
-					}, {
-						enableHighAccuracy: true
-					});
-				} else {
-					unSetMap();
-					updateElement("resultTbody", l[5]);
-				}
-				return false
-			}
-
 			function query(query) {
 				if (typeof query == "undefined") {
 					query = location.hash.substring(1);
@@ -566,12 +475,10 @@
 				MapOpacity(.6);
 				currentQuery = location.hash = document.forms[0].ip.value = query;
 				updateElement("resultText", l[23]);
-				ajax(APIendpoint + "/json/" + query + "?fields=258047", function(response) {
-					updateElement("geoDiv", "");
+				ajax(APIendpoint + "/json/" + query + "?fields=520191", function(response) {
 					updateElement("resultTbody", "");
 					if (response.status == "success") {
-						zoom = response.zip != "" ? 13 : response.city != "" ? 12 : 6;
-						setMap(response.lat, response.lon, zoom);
+						setMap(response.lat, response.lon, response.accuracy);
 						updateTable(l[6], makeClickable(response.query, response.mobile, response.proxy), "qr");
 						updateTable(l[7], response.country);
 						updateTable(l[8], response.countryCode);
@@ -587,9 +494,6 @@
 						updateTable(l[19], response.as);
 						if (query == "") {
 							document.forms[0].ip.value = myIp = response.query;
-							if (navigator.geolocation) {
-								updateElement("geoDiv", "<a href='#' onclick='getBrowserGeo()'>" + l[26] + "</a>");
-							}
 							updateElement("resultText", l[24]);
 							delayed();
 						} else {
