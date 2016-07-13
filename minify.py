@@ -1,4 +1,4 @@
-import codecs, json, os
+import codecs, json, os, re
 from urllib2 import Request, urlopen
 from urllib import urlencode
 
@@ -58,8 +58,18 @@ f = codecs.open('source.html', 'r', 'utf-8')
 contents = f.read()
 f.close()
 
+i = 0
+lang = langOld = re.search('var translations = {(.*)},', contents, re.DOTALL).group(1)
+langKeys = re.search('var translations = {.*{(.*)},', contents, re.DOTALL).group(1)
+for k in re.findall(r'(\w*): ', langKeys, re.MULTILINE):
+	contents = re.sub(r'\bl.%s\b' % k, "l[%i]" % i, contents)
+	lang = re.sub(r'\t%s: ' % k, '', lang)
+	i+=1
+contents = contents.replace(langOld, lang.replace('{', '[').replace('}', ']'))
+	
 for what, to in replacements.iteritems():
 	contents = contents.replace(what, to)
+
 
 post = {
 	'code': contents.encode('utf-8'),
