@@ -31,8 +31,6 @@ replacements = {
 	'MapOpacity': 'mo',
 	'get_internal': 'gi',
 	'get_dns': 'gd',
-	'delayed': 'di',
-	'getBrowserGeo': 'g',
 	'query(': 'q(',
 	'currentQuery': 'cq',
 	'setLanguage': 'sl',
@@ -45,9 +43,7 @@ replacements = {
 	'init(': 'k(',
 	'footerLanguages': 'i',
 	'contact(': 'cn(',
-	'mapRadius': 'rn',
 	'calculateZoomLevel': 'cz',
-	'isWatching': 'iw',
 	'APIendpoint': 'ep',
 	'get_fingerprint': 'fp',
 	'encodeHTML': 'eh',
@@ -63,6 +59,8 @@ lang = langOld = re.search('var translations = {(.*)},', contents, re.DOTALL).gr
 langKeys = re.search('var translations = {.*{(.*)},', contents, re.DOTALL).group(1)
 for k in re.findall(r'(\w*): ', langKeys, re.MULTILINE):
 	contents = re.sub(r'\bl.%s\b' % k, "l[%i]" % i, contents)
+	if k == 'LANG':
+		contents = contents.replace('translations[lng].LANG', 'translations[lng][%i]' % i)
 	lang = re.sub(r'\t%s: ' % k, '', lang)
 	i+=1
 contents = contents.replace(langOld, lang.replace('{', '[').replace('}', ']'))
