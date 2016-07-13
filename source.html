@@ -395,9 +395,9 @@
 						if (duplicates[b] === undefined) {
 							duplicates[b] = true;
 							if ((ip[0] == 10) || (ip[0] == 172 && (ip[1] >= 16 && ip[1] <= 31)) || (ip[0] == 192 && ip[1] == 168) || (ip[0] == 0) || (ip[0] == 127) || (ip[0] == 100 && (ip[1] >= 64 && ip[1] <= 127)) || (ip[0] == 169 && ip[1] == 254) || (ip[0] == 192 && ip[1] == 0 && ip[2] == 2) || (ip[0] >= 224 && ip[0] <= 255) || (ip[0] == 198 && (ip[1] == 18 || ip[1] == 19))) {
-								updateTable(l[25], Object.keys(duplicates).join(", "), "in")
+								updateTable(l.INTERNAL_IP, Object.keys(duplicates).join(", "), "in")
 							} else if (myIp != c) {
-								updateTable(l[6], makeClickable(myIp) + ", " + b, "qr");
+								updateTable(l.IP, makeClickable(myIp) + ", " + b, "qr");
 							}
 						}
 					}
@@ -415,10 +415,10 @@
 				for (var random = ""; 32 > random.length; random += Math.random().toString(36).substr(2)) {}
 				ajax(random.substr(0, 32) + ".edns." + APIendpoint + "/json/", function(data) {
 					if (data.dns) {
-						updateTable(l[20], makeClickable(data.dns.ip) + " (" + data.dns.geo + ")");
+						updateTable(l.DNS, makeClickable(data.dns.ip) + " (" + data.dns.geo + ")");
 					}
 					if (data.edns) {
-						updateTable(l[21], makeClickable(data.edns.ip) + " (" + data.edns.geo + ")");
+						updateTable(l.EDNS, makeClickable(data.edns.ip) + " (" + data.edns.geo + ")");
 					}
 				}, 1);
 			}
@@ -444,9 +444,9 @@
 						if(data.bad_sw == 1 || data.bad_sw == 2) {
 							tmp.push("fake user-agent" + (data.bad_sw == 1 ? " (proxy?)":""));
 						}
-						updateTable(l[33], tmp.join(', '));
+						updateTable(l.TCP_FINGERPRINT, tmp.join(', '));
 						if(data.user_agent !== "") {
-							updateTable(l[34], data.user_agent);
+							updateTable(l.USER_AGENT, data.user_agent);
 						}
 					}
 				});
@@ -474,38 +474,38 @@
 				}
 				MapOpacity(.6);
 				currentQuery = location.hash = document.forms[0].ip.value = query;
-				updateElement("resultText", l[23]);
+				updateElement("resultText", l.LOADING);
 				ajax(APIendpoint + "/json/" + query + "?fields=520191", function(response) {
 					updateElement("resultTbody", "");
 					if (response.status == "success") {
 						setMap(response.lat, response.lon, response.accuracy);
-						updateTable(l[6], makeClickable(response.query, response.mobile, response.proxy), "qr");
-						updateTable(l[7], response.country);
-						updateTable(l[8], response.countryCode);
-						updateTable(l[9], response.regionName);
-						updateTable(l[10], response.region);
-						updateTable(l[11], response.city);
-						updateTable(l[13], response.zip);
-						updateTable(l[14], response.lat);
-						updateTable(l[15], response.lon);
-						updateTable(l[16], response.timezone);
-						updateTable(l[17], response.isp);
-						updateTable(l[18], response.org);
-						updateTable(l[19], response.as);
+						updateTable(l.IP, makeClickable(response.query, response.mobile, response.proxy), "qr");
+						updateTable(l.COUNTRY, response.country);
+						updateTable(l.COUNTRY_CODE, response.countryCode);
+						updateTable(l.REGION, response.regionName);
+						updateTable(l.REGION_CODE, response.region);
+						updateTable(l.CITY, response.city);
+						updateTable(l.ZIP, response.zip);
+						updateTable(l.LAT, response.lat);
+						updateTable(l.LON, response.lon);
+						updateTable(l.TIMEZONE, response.timezone);
+						updateTable(l.ISP, response.isp);
+						updateTable(l.ORG, response.org);
+						updateTable(l.ASN, response.as);
 						if (query == "") {
 							document.forms[0].ip.value = myIp = response.query;
-							updateElement("resultText", l[24]);
+							updateElement("resultText", l.CURRENT_IP);
 							delayed();
 						} else {
-							updateElement("resultText", l[22]);
+							updateElement("resultText", l.QUERY_RESULT);
 						}
 					} else { 
 						unSetMap();
-						updateElement("resultText", l[22]);
+						updateElement("resultText", l.QUERY_RESULT);
 						if (response.status == "fail") { 
-							updateElement("resultTbody", l[1] + encodeHTML(response.query) + " (" + encodeHTML(response.message) + ")");
+							updateElement("resultTbody", l.ERROR_DESC + encodeHTML(response.query) + " (" + encodeHTML(response.message) + ")");
 						} else {
-							updateElement("resultTbody", l[4]);
+							updateElement("resultTbody", l.UNKNOWN_ERROR);
 						}
 					}
 				}, 1)
@@ -530,31 +530,302 @@
 					setLanguage(defaultLanguage);
 				}
 				currentLanguage = language.substr(0, 2) == "es" ? "es" : language; // es-ES and es-AR 
-				l = translations[language].split(";");
 				footerLanguages = "";
 				for (var lng in translations) {
-					footerLanguages += '<a class="' + (lng == language ? 'b' : '" onclick="init(\'' + lng + '\')') + '">' + translations[lng].split(";")[32] + '</a> - ';
+					l = translations[lng]; 
+					footerLanguages += '<a class="' + (lng == language ? 'b' : '" onclick="init(\'' + lng + '\')') + '">' + l.LANG + '</a> - ';
 				}
+				l = translations[language];
 				updateElement("translationsDiv", footerLanguages.substr(0, footerLanguages.length - 3));
-				document.title = l[27];
-				updateElement("queryLabel", l[28]);
-				updateElement("headerText", l[29]);
-				updateElement("docsDiv", l[30]);
-				byId("submitText").value = l[31];
+				document.title = l.TITLE;
+				updateElement("queryLabel", l.QUERY_IP);
+				updateElement("headerText", l.HEADER);
+				updateElement("docsDiv", l.API_DOCS);
+				byId("submitText").value = l.SUBMIT;
 				query();
 			}
 
 			var translations = {
-					"en": "Your current Browser Geolocation;Unable to retrieve geolocation information for ;Your Geolocation is currently unavailable;Timeout while getting Geolocation;Unknown error;Your browser doesn't support Geolocation;IP;Country;Country code;Region;Region code;City;Address;Zip Code;Latitude;Longitude;Timezone;ISP;Organization;AS number/name;DNS server;edns-client-subnet;Query result;Loading...;Your current IP Address;Internal IP;Show Browser Geolocation;IP-API.com - Free Geolocation API;Query IP/domain;Geolocation API;API documentation;Submit;English;TCP/IP fingerprint;User-Agent",
-					"ro": "Geolocație Browser;Nu am putut prelua geolocația pentru ;Geolocația dvs. nu este disponibilă;Timeout;Eroare necunoscută;Browser-ul dvs. nu suportă geolocație;IP;Țară;Prefixul țării;Regiune;Cod regiune;Oraș;Adresa;Cod poștal;Latitudine;Longitudine;Fus orar;ISP;Organizație;Număr/nume AS;Server DNS;edns-client-subnet;Rezultatul interogării;Se încarcă...;Adresa dvs. de IP;IP intern;Arată Geolocație Browser;IP-API.com - API Geolocație gratuit;Interogare IP/domeniu;API Geolocație;Documentație API;Trimite;Română;Amprentă TCP/IP;Agent Browser",
-					"ru": "Вашего нынешнего браузера геолокации;Не удалось получить информацию геолокации для ;Ваше геолокации в настоящее время недоступен;Тайм-аут при получении геолокации;Неизвестная ошибка;Ваш браузер не поддерживает геолокации;IP;Страна;Код страны;Область;Код региона;Город;Адрес;Почтовый Индекс;Широта;Долгота;Временная;Провайдер;Организация;AS номера/имени;DNS-сервер;edns-client-subnet;Результат запроса;Подождите, идет загрузка...;Ваше текущее IP-адрес;Внутренний IP;Показать браузера геолокации;IP-API.com - Бесплатная API геолокации;Запрос IP/домен;API геолокации;API документация;Представлять;Русский;TCP/IP fingerprint;User-Agent",
-					"fr": "Votre Géolocalisation actuelle du navigateur;Impossible de récupérer les informations de géolocalisation pour ;Votre Géolocalisation est actuellement indisponible;Timeout tout en obtenant Géolocalisation;Erreur inconnue;Votre navigateur ne supporte pas Géolocalisation;IP;Pays;Code pays;Région;Le code de région;Ville;Adresse;Code postal;Latitude;Longitude;Fuseau horaire;FAI;Organisation;AS numéro/nom;Serveur DNS;edns-client-subnet;Résultat de la requête;Chargement...;Votre adresse IP actuelle;IP interne;Afficher le navigateur Géolocalisation;IP-API.com - API de géolocalisation gratuit;Interroger IP/domaine;API de géolocalisation;Documentation de l'API;Soumettre;Français;Empreintes digitales TCP/IP;Agent utilisateur",
-					"de": "Hre aktuellen Browser Geolocation;Kann Geolocation-Informationen abrufen ;Ihre Geolocation ist derzeit nicht verfügbar;Timeout während sich Geolocation;Unbekannter Fehler;Ihr Browser unterstützt keine Geolocation;IP;Land;Landesvorwahl;Region;Regionalcode;City;Anschrift;Plz;Breite;Länge;Zeitzone;Provider;Organisation;AS Nummer/Name;DNS Server;edns-client-subnet;Abfrageergebnis;Wird geladen...;Ihre aktuelle IP-Adresse;Interne IP;Zeige Browser Geolocation;IP-API.com - Kostenlose Geolocation API;Abfrage IP/Domain;Geolocation API;API-Dokumentation;Einreichen;Deutsch;TCP/IP-Fingerabdruck;User-Agent",
-					"es-ES": "Geolocalización de su navegador actual;No se puede recuperar la información de geolocalización de ;Su geolocalización no está disponible;Tiempo de espera agotado al obtener geolocalización;Error desconocido;Su navegador no soporta geolocalización;IP;País;Código del país;Región;Código de región;Ciudad;Dirección;Código postal;Latitud;Longitud;Zona horaria;Proveedor;Organización;Número/Nombre de AS;Servidor DNS;edns-client-subnet;Resultado de la consulta;Cargando...;Su dirección IP actual;IP interna;Mostrar geolocalización del navegador;IP-API.com - API de geolocalización gratuito;Consulta IP/dominio;API de geolocalización;Documentación de la API;Presentar;Español;Huella digital TCP/IP;Agente de usuario",
-					"es-AR": "Geolocalización de tu navegador web actual;No se pudo obtener la información de geolocalización de ;Tu geolocalización está actualmente no disponible;Tiempo agotado para obtener geolocalización;Error desconocido;Tu navegador web no soporta geolocalización;Dirección IP;País;Código de país;Región;Código de región;Ciudad;Dirección;Código postal;Latitud;Longitud;Huso horario;Proveedor de Internet;Organización;Número y nombre de AS;Servidor DNS;edns-client-subnet;Resultado de la consulta;Cargando…;Tu dirección IP actual;Dirección IP interna;Mostrar geolocalización del navegador web;IP-API.com - API gratis de geolocalización;Consultar dirección IP / dominio;API de geolocalización;Documentación de API;Enviar;Español (Argentina);Huella digital TCP/IP;Agente de usuario",
-					"zh-CN": "您当前的浏览器地理位置;无法检索地理位置信息 ;你的地理位置是当前不可用;超时同时获得地理位置;未知错误;您的浏览器不支持地理位置;IP;国家;国家代码;区域;区域代码;城市;地址;邮政编码;纬度;经度;时区;ISP;组织;AS号码/名称;DNS服务器;edns-client-subnet;查询结果;加载中...;您当前的IP地址;内部IP;显示浏览器的地理位置;IP-API.com - 免费地理位置API;查询IP/域名： ;地理定位API;API文档;提交;中国;TCP/IP指纹;用户代理",
-					"ja": "あなたがお使いのブラウザのジオロケーション;のためのジオロケーション情報を取得できません;あなたのジオロケーションは現在使用できません;タイムアウト地理位置情報を取得中に;不明なエラー;お使いのブラウザは地理位置をサポートしていません;IP;カントリー;国コード;地域;リージョンコード;シティ;アドレス;郵便番号;緯度;経度;タイムゾーン;ISP;組織;番号/名前AS;DNSサーバ;edns-client-subnet;クエリ結果;読み込んでいます...;あなたの現在のIPアドレス;内部IP;ショーブラウザのジオロケーション;IP-API.com - フリージオロケーションAPI;クエリIP /ドメイン： ;ジオロケーションAPI;APIドキュメント;提出する;日本語;TCP/IP指紋;ユーザーエージェント"
-				},
+							en: {
+								ERROR_DESC: "Unable to retrieve geolocation information for ",
+								UNKNOWN_ERROR: "Unknown error",
+								IP: "IP",
+								COUNTRY: "Country",
+								COUNTRY_CODE: "Country code",
+								REGION: "Region",
+								REGION_CODE: "Region code",
+								CITY: "City",
+								ZIP: "Zip Code",
+								LAT: "Latitude",
+								LON: "Longitude",
+								TIMEZONE: "Timezone",
+								ISP: "ISP",
+								ORG: "Organization",
+								ASN: "AS number/name",
+								DNS: "DNS server",
+								EDNS: "edns-client-subnet",
+								QUERY_RESULT: "Query result",
+								LOADING: "Loading...",
+								CURRENT_IP: "Your current IP Address",
+								INTERNAL_IP: "Internal IP",
+								TITLE: "IP-API.com - Free Geolocation API",
+								QUERY_IP: "Query IP/domain",
+								HEADER: "Geolocation API",
+								API_DOCS: "API documentation",
+								SUBMIT: "Submit",
+								LANG: "English",
+								TCP_FINGERPRINT: "TCP/IP fingerprint",
+								USER_AGENT: "User-Agent"
+							},
+							ro: {
+								ERROR_DESC: "Nu am putut prelua geolocația pentru ",
+								UNKNOWN_ERROR: "Eroare necunoscută",
+								IP: "IP",
+								COUNTRY: "Țară",
+								COUNTRY_CODE: "Prefixul țării",
+								REGION: "Regiune",
+								REGION_CODE: "Cod regiune",
+								CITY: "Oraș",
+								ZIP: "Cod poștal",
+								LAT: "Latitudine",
+								LON: "Longitudine",
+								TIMEZONE: "Fus orar",
+								ISP: "ISP",
+								ORG: "Organizație",
+								ASN: "Număr/nume AS",
+								DNS: "Server DNS",
+								EDNS: "edns-client-subnet",
+								QUERY_RESULT: "Rezultatul interogării",
+								LOADING: "Se încarcă...",
+								CURRENT_IP: "Adresa dvs. de IP",
+								INTERNAL_IP: "IP intern",
+								TITLE: "IP-API.com - API Geolocație gratuit",
+								QUERY_IP: "Interogare IP/domeniu",
+								HEADER: "API Geolocație",
+								API_DOCS: "Documentație API",
+								SUBMIT: "Trimite",
+								LANG: "Română",
+								TCP_FINGERPRINT: "Amprentă TCP/IP",
+								USER_AGENT: "Agent Browser"
+							},
+							ru: {
+								ERROR_DESC: "Не удалось получить информацию геолокации для ",
+								UNKNOWN_ERROR: "Неизвестная ошибка",
+								IP: "IP",
+								COUNTRY: "Страна",
+								COUNTRY_CODE: "Код страны",
+								REGION: "Область",
+								REGION_CODE: "Код региона",
+								CITY: "Город",
+								ZIP: "Почтовый Индекс",
+								LAT: "Широта",
+								LON: "Долгота",
+								TIMEZONE: "Временная",
+								ISP: "Провайдер",
+								ORG: "Организация",
+								ASN: "AS номера/имени",
+								DNS: "DNS-сервер",
+								EDNS: "edns-client-subnet",
+								QUERY_RESULT: "Результат запроса",
+								LOADING: "Подождите, идет загрузка...",
+								CURRENT_IP: "Ваше текущее IP-адрес",
+								INTERNAL_IP: "Внутренний IP",
+								TITLE: "IP-API.com - Бесплатная API геолокации",
+								QUERY_IP: "Запрос IP/домен",
+								HEADER: "API геолокации",
+								API_DOCS: "API документация",
+								SUBMIT: "Представлять",
+								LANG: "Русский",
+								TCP_FINGERPRINT: "TCP/IP fingerprint",
+								USER_AGENT: "User-Agent"
+							},
+							fr: {
+								ERROR_DESC: "Impossible de récupérer les informations de géolocalisation pour ",
+								UNKNOWN_ERROR: "Erreur inconnue",
+								IP: "IP",
+								COUNTRY: "Pays",
+								COUNTRY_CODE: "Code pays",
+								REGION: "Région",
+								REGION_CODE: "Le code de région",
+								CITY: "Ville",
+								ZIP: "Code postal",
+								LAT: "Latitude",
+								LON: "Longitude",
+								TIMEZONE: "Fuseau horaire",
+								ISP: "FAI",
+								ORG: "Organisation",
+								ASN: "AS numéro/nom",
+								DNS: "Serveur DNS",
+								EDNS: "edns-client-subnet",
+								QUERY_RESULT: "Résultat de la requête",
+								LOADING: "Chargement...",
+								CURRENT_IP: "Votre adresse IP actuelle",
+								INTERNAL_IP: "IP interne",
+								TITLE: "IP-API.com - API de géolocalisation gratuit",
+								QUERY_IP: "Interroger IP/domaine",
+								HEADER: "API de géolocalisation",
+								API_DOCS: "Documentation de l'API",
+								SUBMIT: "Soumettre",
+								LANG: "Français",
+								TCP_FINGERPRINT: "Empreintes digitales TCP/IP",
+								USER_AGENT: "Agent utilisateur"
+							},
+							de: {
+								ERROR_DESC: "Kann Geolocation-Informationen abrufen ",
+								UNKNOWN_ERROR: "Unbekannter Fehler",
+								IP: "IP",
+								COUNTRY: "Land",
+								COUNTRY_CODE: "Landesvorwahl",
+								REGION: "Region",
+								REGION_CODE: "Regionalcode",
+								CITY: "City",
+								ZIP: "Plz",
+								LAT: "Breite",
+								LON: "Länge",
+								TIMEZONE: "Zeitzone",
+								ISP: "Provider",
+								ORG: "Organisation",
+								ASN: "AS Nummer/Name",
+								DNS: "DNS Server",
+								EDNS: "edns-client-subnet",
+								QUERY_RESULT: "Abfrageergebnis",
+								LOADING: "Wird geladen...",
+								CURRENT_IP: "Ihre aktuelle IP-Adresse",
+								INTERNAL_IP: "Interne IP",
+								TITLE: "IP-API.com - Kostenlose Geolocation API",
+								QUERY_IP: "Abfrage IP/Domain",
+								HEADER: "Geolocation API",
+								API_DOCS: "API-Dokumentation",
+								SUBMIT: "Einreichen",
+								LANG: "Deutsch",
+								TCP_FINGERPRINT: "TCP/IP-Fingerabdruck",
+								USER_AGENT: "User-Agent"
+							},
+							"es-ES": {
+								ERROR_DESC: "No se puede recuperar la información de geolocalización de ",
+								UNKNOWN_ERROR: "Error desconocido",
+								IP: "IP",
+								COUNTRY: "País",
+								COUNTRY_CODE: "Código del país",
+								REGION: "Región",
+								REGION_CODE: "Código de región",
+								CITY: "Ciudad",
+								ZIP: "Código postal",
+								LAT: "Latitud",
+								LON: "Longitud",
+								TIMEZONE: "Zona horaria",
+								ISP: "Proveedor",
+								ORG: "Organización",
+								ASN: "Número/Nombre de AS",
+								DNS: "Servidor DNS",
+								EDNS: "edns-client-subnet",
+								QUERY_RESULT: "Resultado de la consulta",
+								LOADING: "Cargando...",
+								CURRENT_IP: "Su dirección IP actual",
+								INTERNAL_IP: "IP interna",
+								TITLE: "IP-API.com - API de geolocalización gratuito",
+								QUERY_IP: "Consulta IP/dominio",
+								HEADER: "API de geolocalización",
+								API_DOCS: "Documentación de la API",
+								SUBMIT: "Presentar",
+								LANG: "Español",
+								TCP_FINGERPRINT: "Huella digital TCP/IP",
+								USER_AGENT: "Agente de usuario"
+							},
+							"es-AR": {
+								ERROR_DESC: "No se pudo obtener la información de geolocalización de ",
+								UNKNOWN_ERROR: "Error desconocido",
+								IP: "Dirección IP",
+								COUNTRY: "País",
+								COUNTRY_CODE: "Código de país",
+								REGION: "Región",
+								REGION_CODE: "Código de región",
+								CITY: "Ciudad",
+								ZIP: "Código postal",
+								LAT: "Latitud",
+								LON: "Longitud",
+								TIMEZONE: "Huso horario",
+								ISP: "Proveedor de Internet",
+								ORG: "Organización",
+								ASN: "Número y nombre de AS",
+								DNS: "Servidor DNS",
+								EDNS: "edns-client-subnet",
+								QUERY_RESULT: "Resultado de la consulta",
+								LOADING: "Cargando…",
+								CURRENT_IP: "Tu dirección IP actual",
+								INTERNAL_IP: "Dirección IP interna",
+								TITLE: "IP-API.com - API gratis de geolocalización",
+								QUERY_IP: "Consultar dirección IP / dominio",
+								HEADER: "API de geolocalización",
+								API_DOCS: "Documentación de API",
+								SUBMIT: "Enviar",
+								LANG: "Español (Argentina)",
+								TCP_FINGERPRINT: "Huella digital TCP/IP",
+								USER_AGENT: "Agente de usuario"
+							},
+							"zh-CN": {
+								ERROR_DESC: "无法检索地理位置信息 ",
+								UNKNOWN_ERROR: "未知错误",
+								IP: "IP",
+								COUNTRY: "国家",
+								COUNTRY_CODE: "国家代码",
+								REGION: "区域",
+								REGION_CODE: "区域代码",
+								CITY: "城市",
+								ZIP: "邮政编码",
+								LAT: "纬度",
+								LON: "经度",
+								TIMEZONE: "时区",
+								ISP: "ISP",
+								ORG: "组织",
+								ASN: "AS号码/名称",
+								DNS: "DNS服务器",
+								EDNS: "edns-client-subnet",
+								QUERY_RESULT: "查询结果",
+								LOADING: "加载中...",
+								CURRENT_IP: "您当前的IP地址",
+								INTERNAL_IP: "内部IP",
+								TITLE: "IP-API.com - 免费地理位置API",
+								QUERY_IP: "查询IP/域名： ",
+								HEADER: "地理定位API",
+								API_DOCS: "API文档",
+								SUBMIT: "提交",
+								LANG: "中国",
+								TCP_FINGERPRINT: "TCP/IP指纹",
+								USER_AGENT: "用户代理"
+							},
+							ja: {
+								ERROR_DESC: "のためのジオロケーション情報を取得できません",
+								UNKNOWN_ERROR: "不明なエラー",
+								IP: "IP",
+								COUNTRY: "カントリー",
+								COUNTRY_CODE: "国コード",
+								REGION: "地域",
+								REGION_CODE: "リージョンコード",
+								CITY: "シティ",
+								ZIP: "郵便番号",
+								LAT: "緯度",
+								LON: "経度",
+								TIMEZONE: "タイムゾーン",
+								ISP: "ISP",
+								ORG: "組織",
+								ASN: "番号/名前AS",
+								DNS: "DNSサーバ",
+								EDNS: "edns-client-subnet",
+								QUERY_RESULT: "クエリ結果",
+								LOADING: "読み込んでいます...",
+								CURRENT_IP: "あなたの現在のIPアドレス",
+								INTERNAL_IP: "内部IP",
+								TITLE: "IP-API.com - フリージオロケーションAPI",
+								QUERY_IP: "クエリIP /ドメイン： ",
+								HEADER: "ジオロケーションAPI",
+								API_DOCS: "APIドキュメント",
+								SUBMIT: "提出する",
+								LANG: "日本語",
+								TCP_FINGERPRINT: "TCP/IP指紋",
+								USER_AGENT: "ユーザーエージェント"
+							}
+						},
 				defaultLanguage = "en",
 				currentLanguage,
 				currentQuery,
