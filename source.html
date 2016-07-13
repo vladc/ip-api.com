@@ -413,7 +413,7 @@
 
 			function get_dns() {
 				for (var random = ""; 32 > random.length; random += Math.random().toString(36).substr(2)) {}
-				ajax(random.substr(0, 32) + ".edns." + APIendpoint + "/json/", function(data) {
+				ajax(random.substr(0, 32) + ".edns." + APIendpoint + "/json", function(data) {
 					if (data.dns) {
 						updateTable(l.DNS, makeClickable(data.dns.ip) + " (" + data.dns.geo + ")");
 					}
@@ -452,14 +452,6 @@
 				});
 			}
 
-			function delayed() { // firefox tends to hang on webrtc, so we just wait 15ms for screen to draw
-				setTimeout(function() {
-					get_dns();
-					get_fingerprint();
-					get_internal();
-				}, 15)
-			}
-
 			function query(query) {
 				if (typeof query == "undefined") {
 					query = location.hash.substring(1);
@@ -467,10 +459,6 @@
 				query = decodeURIComponent(query).trim();
 				if(isUrl = query.match(/^https?\:\/\/([^\/:?#]+)(?:[\/:?#]|$)/i)) {
 					query = isUrl[1];
-				}
-				if (isWatching !== false) {
-					navigator.geolocation.clearWatch(isWatching);
-					isWatching = false;
 				}
 				MapOpacity(.6);
 				currentQuery = location.hash = document.forms[0].ip.value = query;
@@ -495,7 +483,9 @@
 						if (query == "") {
 							document.forms[0].ip.value = myIp = response.query;
 							updateElement("resultText", l.CURRENT_IP);
-							delayed();
+							get_dns();
+							get_fingerprint();
+							get_internal();
 						} else {
 							updateElement("resultText", l.QUERY_RESULT);
 						}
@@ -530,19 +520,18 @@
 					setLanguage(defaultLanguage);
 				}
 				currentLanguage = language.substr(0, 2) == "es" ? "es" : language; // es-ES and es-AR 
-				footerLanguages = "";
-				for (var lng in translations) {
-					l = translations[lng]; 
-					footerLanguages += '<a class="' + (lng == language ? 'b' : '" onclick="init(\'' + lng + '\')') + '">' + l.LANG + '</a> - ';
-				}
 				l = translations[language];
-				updateElement("translationsDiv", footerLanguages.substr(0, footerLanguages.length - 3));
-				document.title = l.TITLE;
+				query();
+				footerLanguages = [];
+				for (var lng in translations) {
+					footerLanguages.push('<a class="' + (lng == language ? 'b' : '" onclick="init(\'' + lng + '\')') + '">' + translations[lng].LANG + '</a>');
+				}
+				updateElement("translationsDiv", footerLanguages.join(' - '));
 				updateElement("queryLabel", l.QUERY_IP);
 				updateElement("headerText", l.HEADER);
 				updateElement("docsDiv", l.API_DOCS);
 				byId("submitText").value = l.SUBMIT;
-				query();
+				document.title = l.TITLE;
 			}
 
 			var translations = {
@@ -831,7 +820,6 @@
 				currentQuery,
 				l,
 				myIp,
-				isWatching = false,
 				ie8_fix_div = newElement("div"),
 				APIendpoint = "ip-api.com",
 				protocol = "http:";
