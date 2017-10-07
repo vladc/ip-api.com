@@ -89,7 +89,7 @@
 			}
 			td,
 			th {
-				vertical-align: middle;
+				vertical-align: top;
 				line-height: 23px;
 			}
 			th {
@@ -100,10 +100,15 @@
 				width: 135px;
 			}
 			td {
-				padding: 0 2px 0 5px;
+				padding: 0 2px 0 7px;
 				font-weight: 700;
 				font-size: 16px;
 				color: #737373;
+				background: #fff;
+				background: rgba(255, 255, 255, .7);
+				display:inline-block;
+				position:relative;
+				top:1px;
 			}
 			#submitText {
 				width: 205px;
@@ -119,10 +124,7 @@
 				background-repeat: no-repeat;
 				background-position: right top;
 				width: 830px;
-			}
-			#resultDiv span {
-				background: #fff;
-				background: rgba(255, 255, 255, .7);
+
 			}
 			input:hover {
 				-moz-box-shadow: 0 0 3px #999;
@@ -217,7 +219,7 @@
 		</div>
 		<div class="footerClass">
 			<div id="translationsDiv"></div>
-			&copy; 2016 IP-API.com |
+			&copy; 2017 IP-API.com |
 			<a href="/docs/">api</a> |
 			<a href="https://signup.ip-api.com/">pro</a> |
 			<a onclick="contact()">contact</a>
@@ -228,7 +230,7 @@
 				return false
 			}
 
-			function ajax(url, callback, setLang) {
+			function ajax(url, callback) {
 				url = protocol + "//" + url;
 				this.getRequest = function() {
 					return window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : window.XMLHttpRequest ? new XMLHttpRequest : false
@@ -242,9 +244,6 @@
 					}
 				}
 				req.open("GET", url, true);
-				if (setLang) {
-					req.setRequestHeader("Accept-Language", "force;" + currentLanguage)
-				}
 				req.send();
 			}
 
@@ -269,13 +268,7 @@
 			}
 
 			function updateElement(element, html) {
-				try {
-					byId(element).innerHTML = html
-				} catch (i) {
-					if (element == 'resultTbody') {
-						ie8_fix(byId(element), html);
-					}
-				}
+				byId(element).innerHTML = html;
 			}
 
 			function updateTable(name, value, id) {
@@ -286,14 +279,12 @@
 					}
 					var tr = newElement("tr"),
 						th = newElement("th"),
-						td = newElement("td"),
-						span = newElement("span");
+						td = newElement("td");
 					if (id) {
-						span.id = id;
+						td.id = id;
 					}
-					th.appendChild(document.createTextNode(name + ":"));
-					span.innerHTML = value;
-					td.appendChild(span);
+					th.appendChild(document.createTextNode(name));
+					td.innerHTML = value;
 					tr.appendChild(th);
 					tr.appendChild(td);
 					table.appendChild(tr);
@@ -301,12 +292,7 @@
 			}
 
 			function makeClickable(ip, mobile, proxy) {
-				return "<a " + (mobile ? "class='mobile' title='mobile connection'" : (proxy ? "class='proxy' title='proxy'" : "")) + " href='#" + ip + "'>" + ip + "</a>"
-			}
-
-			function ie8_fix(element, html) {
-				var i = ie8_fix_div;
-				i.innerHTML = "<table><tbody id='resultTbody'><th>" + html + "</th></tbody></table>", element.parentNode.replaceChild(i.firstChild.firstChild, element)
+				return "<a " + (mobile ? "class='mobile' title='mobile'" : (proxy ? "class='proxy' title='proxy'" : "")) + " href='#" + ip + "'>" + ip + "</a>"
 			}
 
 			function nullFunction() {}
@@ -322,8 +308,8 @@
 			}
 
 			function setMap(lat, lon, accuracy) {
-				zoom = calculateZoomLevel(accuracy);
-				byId("resultDiv").style.backgroundImage = "url('" + protocol + "//maps.googleapis.com/maps/api/staticmap?key=AIzaSyAjh0Pdk6dasNa6f58zkd86cOrtNxbHQHE&center=" + lat + "," + lon + "&zoom=" + zoom + "&format=jpg&size=320x349&language=" + currentLanguage + "&path=color:0x3af1ad30|weight:" + Math.max(15, parseInt(accuracy * (1190 / Math.pow(2, 17 - zoom)))) + '|' + lat + ',' + lon + '|' + lat + ',' + (lon + 0.00001) + "')";
+				zoomLevel = calculateZoomLevel(accuracy);
+				byId("resultDiv").style.backgroundImage = "url('" + protocol + "//maps.googleapis.com/maps/api/staticmap?key=AIzaSyAjh0Pdk6dasNa6f58zkd86cOrtNxbHQHE&center=" + lat + "," + lon + "&zoom=" + zoomLevel + "&format=jpg&size=320x349&language=" + currentLanguage + "&path=color:0x3af1ad30|weight:" + Math.max(15, parseInt(accuracy * (1190 / Math.pow(2, 17 - zoomLevel)))) + '|' + lat + ',' + lon + '|' + lat + ',' + (lon + 0.00001) + "')";
 				MapOpacity(1);
 			}
 
@@ -411,45 +397,45 @@
 				}, nullFunction)
 			};
 
-			function get_dns() {
-				for (var random = ""; 32 > random.length; random += Math.random().toString(36).substr(2)) {}
-				ajax(random.substr(0, 32) + ".edns." + APIendpoint + "/json", function(data) {
-					if (data.dns) {
-						updateTable(l.DNS, makeClickable(data.dns.ip) + " (" + data.dns.geo + ")");
-					}
-					if (data.edns) {
-						updateTable(l.EDNS, makeClickable(data.edns.ip) + " (" + data.edns.geo + ")");
-					}
-				}, 1);
+			function parse_edns(data) {
+				if (data.dns) {
+					updateTable(l.DNS, makeClickable(data.dns.ip) + " (" + data.dns.geo + ")");
+				}
+				if (data.edns) {
+					updateTable(l.EDNS, makeClickable(data.edns.ip) + " (" + data.edns.geo + ")");
+				}
 			}
 
-			function get_fingerprint() {
+			function parse_fingerprint(data) {
 				// API at fp.ip-api.com - based on github.com/ValdikSS/p0f-mtu - thanks!
-				ajax("fp." + APIendpoint + "/json", function(data) {
-					if (data.status == "success") {
-						if(data.link_mtu !== 0) {
-							tmp = [data.link_mtu + " MTU"];
-						}
-						if(data.link_type !== "") {
-							tmp.push(data.link_type);
-						} else if(data.link_mtu % 2 == 1) {
-							tmp.push("OpenVPN?");
-						}
-						if(data.os_name !== "") {
-							tmp.push(data.os_name + (data.os_flavor !== "" ? " (" + data.os_flavor + ")" : ""));
-						}
-						if(data.http_name !== "") {
-							tmp.push(data.http_name + (data.http_flavor !== "" ? " (" + data.http_flavor + ")" : ""));
-						}
-						if(data.bad_sw == 1 || data.bad_sw == 2) {
-							tmp.push("fake user-agent" + (data.bad_sw == 1 ? " (proxy?)":""));
-						}
-						updateTable(l.TCP_FINGERPRINT, tmp.join(', '));
-						if(data.user_agent !== "") {
-							updateTable(l.USER_AGENT, data.user_agent);
-						}
+				if (data.status == "success") {
+					tmp = [];
+					var con = navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+					if(con && con.type){
+						tmp.push(con.type);
 					}
-				});
+					if(data.link_mtu !== 0) {
+						tmp.push(data.link_mtu + " MTU");
+					}
+					if(data.link_type !== "") {
+						tmp.push(data.link_type);
+					} else if(data.link_mtu % 2 == 1) {
+						tmp.push("OpenVPN?");
+					}
+					if(data.os_name !== "") {
+						tmp.push(data.os_name + (data.os_flavor !== "" ? " (" + data.os_flavor + ")" : ""));
+					}
+					if(data.http_name !== "") {
+						tmp.push(data.http_name + (data.http_flavor !== "" ? " (" + data.http_flavor + ")" : ""));
+					}
+					if(data.bad_sw == 1 || data.bad_sw == 2) {
+						tmp.push("fake user-agent" + (data.bad_sw == 1 ? " (proxy?)":""));
+					}
+					updateTable(l.TCP_FINGERPRINT, tmp.join(', '));
+					if(data.user_agent !== "") {
+						updateTable(l.USER_AGENT, data.user_agent);
+					}
+				}
 			}
 
 			function query(query) {
@@ -463,7 +449,26 @@
 				MapOpacity(.6);
 				currentQuery = location.hash = document.forms[0].ip.value = query;
 				updateElement("resultText", l.LOADING);
-				ajax(APIendpoint + "/json/" + query + "?fields=520191", function(response) {
+				if (query == "") {
+					cache = [];
+					myIp = "";
+					ajax("fp." + APIendpoint + "/json", function(data) {
+						if (myIp == "") {
+							cache.fp = data;
+						} else {
+							parse_fingerprint(data);
+						}
+					});
+					for (var random = ""; 32 > random.length; random += Math.random().toString(36).substr(2)) {}
+					ajax(random.substr(0, 32) + ".edns." + APIendpoint + "/json?lang=" + currentLanguage, function(data) {
+						if (myIp == "") {
+							cache.edns = data;
+						} else {
+							parse_edns(data);
+						}
+					});
+				}
+				ajax(APIendpoint + "/json/" + query + "?fields=520191&lang=" + currentLanguage, function(response) {
 					updateElement("resultTbody", "");
 					if (response.status == "success") {
 						setMap(response.lat, response.lon, response.accuracy);
@@ -483,9 +488,13 @@
 						if (query == "") {
 							document.forms[0].ip.value = myIp = response.query;
 							updateElement("resultText", l.CURRENT_IP);
-							get_dns();
-							get_fingerprint();
 							get_internal();
+							if (typeof cache.fp == "object") {
+								parse_fingerprint(cache.fp);
+							}
+							if (typeof cache.edns == "object") {
+								parse_edns(cache.edns);
+							}
 						} else {
 							updateElement("resultText", l.QUERY_RESULT);
 						}
@@ -498,7 +507,7 @@
 							updateElement("resultTbody", l.UNKNOWN_ERROR);
 						}
 					}
-				}, 1)
+				})
 			}
 
 			function setLanguage(language) {
@@ -820,7 +829,6 @@
 				currentQuery,
 				l,
 				myIp,
-				ie8_fix_div = newElement("div"),
 				APIendpoint = "ip-api.com",
 				protocol = "http:";
 
