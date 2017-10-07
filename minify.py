@@ -30,7 +30,7 @@ replacements = {
 	'unSetMap': 'mu',
 	'MapOpacity': 'mo',
 	'get_internal': 'gi',
-	'get_dns': 'gd',
+	'parse_edns': 'gd',
 	'query(': 'q(',
 	'currentQuery': 'cq',
 	'setLanguage': 'sl',
@@ -45,9 +45,11 @@ replacements = {
 	'contact(': 'cn(',
 	'calculateZoomLevel': 'cz',
 	'APIendpoint': 'ep',
-	'get_fingerprint': 'fp',
+	'parse_fingerprint': 'pfp',
 	'encodeHTML': 'eh',
-	'isUrl': 'iu'
+	'isUrl': 'iu',
+	'zoomLevel': 'zl',
+	'cache': 'ch'
 }
 
 f = codecs.open('source.html', 'r', 'utf-8')
